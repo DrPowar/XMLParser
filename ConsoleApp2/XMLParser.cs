@@ -134,6 +134,7 @@
                 throw new Exception("Expected '<'");
 
             index++;
+            SkipWhitespace(xml, ref index);
             string tagName = ParseTagName(xml, ref index);
 
             XmlNode node = new XmlNode { Name = tagName };

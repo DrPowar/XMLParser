@@ -116,6 +116,7 @@
                 Id = int.Parse(borrowedBookNode.Attributes["id"]),
                 DueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"])
             };
+
             return book;
         }
 

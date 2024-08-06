@@ -13,6 +13,12 @@
         public uint PublicationDate { get; set; }
 
         public List<Chapter> Chapters { get; set; } = new List<Chapter>();
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Title: {Title}, Genre: {Genre}, Author: {Author}, Publication Date: {PublicationDate}, Chapters Count: {Chapters.Count}";
+        }
+
     }
 }
 

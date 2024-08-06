@@ -24,7 +24,6 @@
                     }
                 }
             }
-
             return library;
         }
 
@@ -63,7 +62,6 @@
                         break;
                 }
             }
-
             return book;
         }
 
@@ -82,7 +80,6 @@
                 else if (child.Name == "Content")
                     chapter.Content = child.InnerText;
             }
-
             return chapter;
         }
 
@@ -114,14 +111,13 @@
 
         private static BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
         {
-            return new BorrowedBook
+            BorrowedBook book = new BorrowedBook()
             {
                 Id = int.Parse(borrowedBookNode.Attributes["id"]),
                 DueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"])
             };
+            return book;
         }
-
-
 
         private static XmlNode GetNodeTree(string xml)
         {

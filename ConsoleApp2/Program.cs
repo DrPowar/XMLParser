@@ -21,9 +21,7 @@ namespace ConsoleApp2
             sb.Clear();
 
             Library library = XMLParser.ParseLibrary(s);
-
-
+            library.IntroduceLibrary();
         }
     }
 }
-

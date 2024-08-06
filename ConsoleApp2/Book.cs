@@ -10,9 +10,9 @@
 
         public string Author { get; set; }
 
-        public DateTime PublicationDate { get; set; }
+        public uint PublicationDate { get; set; }
 
-        public List<Chapter> Chapters { get; set; }
+        public List<Chapter> Chapters { get; set; } = new List<Chapter>();
     }
 }
 

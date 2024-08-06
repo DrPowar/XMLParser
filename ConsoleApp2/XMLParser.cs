@@ -52,12 +52,13 @@
                         book.Author = child.InnerText;
                         break;
                     case "PublicationDate":
-                        book.PublicationDate = DateTime.Parse(child.InnerText);
+                        book.PublicationDate = uint.Parse(child.InnerText);
                         break;
                     case "Chapters":
                         foreach (var chapterNode in child.Children)
                         {
-                            book.Chapters.Add(ParseChapter(chapterNode));
+                            var chapter = ParseChapter(chapterNode);
+                            book.Chapters.Add(chapter);
                         }
                         break;
                 }
@@ -76,17 +77,51 @@
             foreach (var child in node.Children)
             {
                 if (child.Name == "Title")
-                {
                     chapter.Title = child.InnerText;
-                }
+
                 else if (child.Name == "Content")
-                {
                     chapter.Content = child.InnerText;
-                }
             }
 
             return chapter;
         }
+
+        private static Member ParseMember(XmlNode memberNode)
+        {
+            var member = new Member
+            {
+                Id = uint.Parse(memberNode.Attributes["id"])
+            };
+
+            foreach (var child in memberNode.Children)
+            {
+                if (child.Name == "Name")
+                    member.Name = child.InnerText;
+
+                else if (child.Name == "MembershipDate")
+                    member.MembershipDate = DateTime.Parse(child.InnerText);
+
+                else if (child.Name == "BooksBorrowed")
+                {
+                    foreach (var borrowedBookNode in child.Children)
+                    {
+                        member.BorrowedBooks.Add(ParseBorrowedBook(borrowedBookNode));
+                    }
+                }
+            }
+            return member;
+        }
+
+        private static BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
+        {
+            return new BorrowedBook
+            {
+                Id = int.Parse(borrowedBookNode.Attributes["id"]),
+                DueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"])
+            };
+        }
+
+
 
         private static XmlNode GetNodeTree(string xml)
         {

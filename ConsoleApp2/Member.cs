@@ -8,6 +8,6 @@
 
         public DateTime MembershipDate { get; set; }
 
-        public List<BorrowedBook> BorrowedBooks { get; set; }
+        public List<BorrowedBook> BorrowedBooks { get; set; } = new List<BorrowedBook>();
     }
 }

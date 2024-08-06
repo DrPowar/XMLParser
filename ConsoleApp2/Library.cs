@@ -2,7 +2,7 @@
 {
     internal sealed class Library
     {
-        public List<Book> Books { get; set; }
-        public List<Member> Members { get; set; }
+        public List<Book> Books { get; set; } = new List<Book>();
+        public List<Member> Members { get; set; } = new List<Member>();
     }
 }

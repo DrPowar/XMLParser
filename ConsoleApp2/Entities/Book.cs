@@ -3,21 +3,14 @@ using System.Collections.Immutable;
 
 namespace ConsoleApp2.Entities
 {
-    public sealed record Book
+    public sealed record Book(
+        uint Id, 
+        string? Title, 
+        string? Genre, 
+        string? Author, 
+        uint PublicationDate, 
+        List<Chapter> Chapters)
     {
-        public uint Id { get; set; }
-
-        public string? Title { get; set; }
-
-        public string? Genre { get; set; }
-
-        public string? Author { get; set; }
-
-        //Тут uint тому, що вхідні дані завжди містять тільки рік і DateTime не вийде зпарсити
-        public uint PublicationDate { get; set; }
-
-        public List<Chapter> Chapters { get; set; } = new List<Chapter>();
-
         public override string ToString()
         {
             return $"Id: {Id}, Title: {Title}, Genre: {Genre}, Author: {Author}, Publication Date: {PublicationDate}, Chapters Count: {Chapters.Count}";

@@ -3,11 +3,8 @@ using System.Collections.Immutable;
 
 namespace ConsoleApp2.Entities
 {
-    public sealed record Library
+    public sealed record Library(List<Book> Books, List<Member> Members)
     {
-        public List<Book> Books { get; set; } = new List<Book>();
-        public List<Member> Members { get; set; } = new List<Member>();
-
 
 
         public void IntroduceLibrary()

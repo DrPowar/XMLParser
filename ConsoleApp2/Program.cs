@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 
-//BenchmarkSwitcher
-//    .FromAssembly(Assembly.GetExecutingAssembly())
-//    .Run(args);
+BenchmarkSwitcher
+    .FromAssembly(Assembly.GetExecutingAssembly())
+    .Run(args);
 
 namespace ConsoleApp2
 {

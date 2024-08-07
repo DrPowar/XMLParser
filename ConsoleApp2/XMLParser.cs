@@ -1,4 +1,5 @@
 ﻿using ConsoleApp2.Entities;
+using Microsoft.VisualBasic;
 
 namespace ConsoleApp2
 {
@@ -7,31 +8,37 @@ namespace ConsoleApp2
         public Library ParseLibrary(string xml)
         {
             XmlNode libraryNode = GetNodeTree(xml);
-            Library library = new Library();
+            List<Book> books = new List<Book>();
+            List<Member> members = new List<Member>();
 
             foreach (var child in libraryNode.Children)
             {
                 if (child.Name == "Books")
-                    library.Books.AddRange(child.Children.Select(b => ParseBook(b)));
+                    books.AddRange(child.Children.Select(b => ParseBook(b)));
 
                 else if (child.Name == "Members")
-                    library.Members.AddRange(child.Children.Select(m => ParseMember(m)));
+                    members.AddRange(child.Children.Select(m => ParseMember(m)));
             }
 
-            return library;
+            return new Library(books, members);
         }
 
         private Book ParseBook(XmlNode node)
         {
-            Book book = new Book();
+            uint id = 0;
+            string genre = string.Empty;
+            string title = string.Empty;
+            string author = string.Empty;
+            uint publicationDate = 0;
+            List<Chapter> chapters = new List<Chapter>();
 
             foreach(var attribute in node.Attributes)
             {
                 if(attribute.Key == "id")
-                    book.Id = uint.Parse(attribute.Value);
+                    id = uint.Parse(attribute.Value);
 
                 else if(attribute.Key == "genre")
-                    book.Genre = attribute.Value;
+                    genre = attribute.Value;
             }
 
             foreach(var child in node.Children)
@@ -39,70 +46,70 @@ namespace ConsoleApp2
                 switch(child.Name)
                 {
                     case "Title":
-                        book.Title = child.InnerText;
+                        title = child.InnerText;
                         break;
                     case "Author":
-                        book.Author = child.InnerText;
+                        author = child.InnerText;
                         break;
                     case "PublicationDate":
-                        book.PublicationDate = uint.Parse(child.InnerText);
+                        publicationDate = uint.Parse(child.InnerText);
                         break;
                     case "Chapters":
-                        book.Chapters.AddRange(child.Children.Select(c => ParseChapter(c)));
+                        chapters.AddRange(child.Children.Select(c => ParseChapter(c)));
                         break;
                 }
             }
-            return book;
+            return new Book(id, title, genre, author, publicationDate, chapters);
         }
 
         private Chapter ParseChapter(XmlNode node)
         {
-            var chapter = new Chapter
-            {
-                Number = uint.Parse(node.Attributes["number"])
-            };
+            uint number = 0;
+            string title = string.Empty;
+            string content = string.Empty;
+
+            number = uint.Parse(node.Attributes["number"]);
 
             foreach (var child in node.Children)
             {
                 if (child.Name == "Title")
-                    chapter.Title = child.InnerText;
+                    title = child.InnerText;
 
                 else if (child.Name == "Content")
-                    chapter.Content = child.InnerText;
+                    content = child.InnerText;
             }
-            return chapter;
+            return new Chapter(number, title, content);
         }
 
         private Member ParseMember(XmlNode memberNode)
         {
-            var member = new Member
-            {
-                Id = uint.Parse(memberNode.Attributes["id"])
-            };
+            uint id = 0;
+            string name = string.Empty;
+            DateTime membershipDate = DateTime.MinValue;
+            List<BorrowedBook> borrowedBooks = new List<BorrowedBook>();
+
+            id = uint.Parse(memberNode.Attributes["id"]);
 
             foreach (var child in memberNode.Children)
             {
                 if (child.Name == "Name")
-                    member.Name = child.InnerText;
+                    name = child.InnerText;
 
                 else if (child.Name == "MembershipDate")
-                    member.MembershipDate = DateTime.Parse(child.InnerText);
+                    membershipDate = DateTime.Parse(child.InnerText);
 
                 else if (child.Name == "BooksBorrowed")
-                    member.BorrowedBooks.AddRange(child.Children.Select(b => ParseBorrowedBook(b)));
+                    borrowedBooks.AddRange(child.Children.Select(b => ParseBorrowedBook(b)));
             }
-            return member;
+            return new Member(id, name, membershipDate, borrowedBooks);
         }
 
         private BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
         {
-            BorrowedBook book = new BorrowedBook()
-            {
-                Id = uint.Parse(borrowedBookNode.Attributes["id"]),
-                DueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"])
-            };
+            uint id = uint.Parse(borrowedBookNode.Attributes["id"]);
+            DateTime dueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"]);
 
-            return book;
+            return new BorrowedBook(id, dueDate);
         }
 
         private XmlNode GetNodeTree(string xml)

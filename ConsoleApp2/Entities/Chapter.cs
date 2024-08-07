@@ -2,14 +2,11 @@
 
 namespace ConsoleApp2.Entities
 {
-    public sealed record Chapter
+    public sealed record Chapter(
+        uint Number, 
+        string? Title, 
+        string? Content)
     {
-        public uint Number { get; set; }
-
-        public string? Title { get; set; }
-
-        public string? Content { get; set; }
-
         public override string ToString()
         {
             return $"Chapter {Number}: {Title}";

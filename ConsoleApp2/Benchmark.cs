@@ -9,6 +9,12 @@ namespace ConsoleApp2
     {
         public string xml;
 
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            xml = GetXMLFile();
+        }
+
         [Benchmark]
         public string GetXMLFile()
         {
@@ -32,7 +38,7 @@ namespace ConsoleApp2
         {
             XMLParser parser = new XMLParser();
 
-            return parser.ParseLibrary();
+            return parser.ParseLibrary(xml);
         } 
     }
 }

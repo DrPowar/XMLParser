@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Text;
 
-BenchmarkSwitcher
-    .FromAssembly(Assembly.GetExecutingAssembly())
-    .Run(args);
+//BenchmarkSwitcher
+//    .FromAssembly(Assembly.GetExecutingAssembly())
+//    .Run(args);
 
 namespace ConsoleApp2
 {
@@ -12,9 +12,7 @@ namespace ConsoleApp2
     {
         static void Main()
         {
-
-
-            string file = "C:\\Users\\User\\Desktop\\LibraryXML_test.txt";
+            string file = "C:\\Users\\User\\Desktop\\LibraryXML.txt";
             StringBuilder sb = new StringBuilder();
             using (StreamReader sr = new StreamReader(file))
             {
@@ -29,9 +27,7 @@ namespace ConsoleApp2
 
             XMLParser parser = new XMLParser();
 
-            Library library = parser.ParseLibrary();
-
-            var summary = BenchmarkRunner.Run<XMLParser>();
+            Library library = parser.ParseLibrary(s);
 
             library.IntroduceLibrary();
 

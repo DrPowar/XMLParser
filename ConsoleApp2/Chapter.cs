@@ -2,7 +2,7 @@
 
 namespace ConsoleApp2
 {
-    public sealed class Chapter
+    public sealed record Chapter
     {
         public uint Number { get; set; }
 

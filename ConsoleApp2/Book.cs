@@ -1,8 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System.Collections.Immutable;
 
 namespace ConsoleApp2
 {
-    public sealed class Book
+    public sealed record Book
     {
         public uint Id { get; set; }
 

@@ -1,8 +1,9 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System.Collections.Immutable;
 
 namespace ConsoleApp2
 {
-    public sealed class Library
+    public sealed record Library
     {
         public List<Book> Books { get; set; } = new List<Book>();
         public List<Member> Members { get; set; } = new List<Member>();

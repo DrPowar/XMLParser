@@ -2,9 +2,9 @@
 
 namespace ConsoleApp2
 {
-    public sealed class BorrowedBook
+    public sealed record BorrowedBook
     {
-        public int Id { get; set; }
+        public uint Id { get; set; }
         public DateTime DueDate { get; set; }
 
         public override string ToString()

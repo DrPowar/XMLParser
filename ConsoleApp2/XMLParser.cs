@@ -1,6 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-
-namespace ConsoleApp2
+﻿namespace ConsoleApp2
 {
     public class XMLParser
     {
@@ -12,24 +10,16 @@ namespace ConsoleApp2
             foreach (var child in libraryNode.Children)
             {
                 if (child.Name == "Books")
-                {
-                    foreach (var book in child.Children)
-                    {
-                        library.Books.Add(ParseBook(book));
-                    }
-                }
+                    library.Books.AddRange(child.Children.Select(b => ParseBook(b)));
+
                 else if (child.Name == "Members")
-                {
-                    foreach (var member in child.Children)
-                    {
-                        library.Members.Add(ParseMember(member));
-                    }
-                }
+                    library.Members.AddRange(child.Children.Select(m => ParseMember(m)));
             }
+
             return library;
         }
 
-        public Book ParseBook(XmlNode node)
+        private Book ParseBook(XmlNode node)
         {
             Book book = new Book();
 
@@ -56,18 +46,14 @@ namespace ConsoleApp2
                         book.PublicationDate = uint.Parse(child.InnerText);
                         break;
                     case "Chapters":
-                        foreach (var chapterNode in child.Children)
-                        {
-                            var chapter = ParseChapter(chapterNode);
-                            book.Chapters.Add(chapter);
-                        }
+                        book.Chapters.AddRange(child.Children.Select(c => ParseChapter(c)));
                         break;
                 }
             }
             return book;
         }
 
-        public Chapter ParseChapter(XmlNode node)
+        private Chapter ParseChapter(XmlNode node)
         {
             var chapter = new Chapter
             {
@@ -85,7 +71,7 @@ namespace ConsoleApp2
             return chapter;
         }
 
-        public Member ParseMember(XmlNode memberNode)
+        private Member ParseMember(XmlNode memberNode)
         {
             var member = new Member
             {
@@ -101,34 +87,29 @@ namespace ConsoleApp2
                     member.MembershipDate = DateTime.Parse(child.InnerText);
 
                 else if (child.Name == "BooksBorrowed")
-                {
-                    foreach (var borrowedBookNode in child.Children)
-                    {
-                        member.BorrowedBooks.Add(ParseBorrowedBook(borrowedBookNode));
-                    }
-                }
+                    member.BorrowedBooks.AddRange(child.Children.Select(b => ParseBorrowedBook(b)));
             }
             return member;
         }
 
-        public BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
+        private BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
         {
             BorrowedBook book = new BorrowedBook()
             {
-                Id = int.Parse(borrowedBookNode.Attributes["id"]),
+                Id = uint.Parse(borrowedBookNode.Attributes["id"]),
                 DueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"])
             };
 
             return book;
         }
 
-        public XmlNode GetNodeTree(string xml)
+        private XmlNode GetNodeTree(string xml)
         {
             int index = 0;
             return ParseElement(xml, ref index);
         }
 
-        public XmlNode ParseElement(string xml, ref int index)
+        private XmlNode ParseElement(string xml, ref int index)
         {
             SkipWhitespace(xml, ref index);
 
@@ -141,36 +122,17 @@ namespace ConsoleApp2
 
             XmlNode node = new XmlNode { Name = tagName };
 
-            while (xml[index] != '>' && xml[index] != '/')
-            {
-                SkipWhitespace(xml, ref index);
-                if (xml[index] != '>' && xml[index] != '/')
-                {
-                    var (attrName, attrValue) = ParseAttribute(xml, ref index);
-                    node.Attributes[attrName] = attrValue;
-                }
-            }
+            HandleAttribute(xml, ref index, node);
 
-            if (xml[index] == '/')
+            if (EndOfTag(xml[index]))
             {
                 index += 2; //Skip />
                 return node;
             }
 
             index++;
+            HandleInnerContext(xml, ref index, node);
 
-            while (xml[index] != '<' || xml[index + 1] != '/')
-            {
-                if (xml[index] == '<')
-                {
-                    var childNode = ParseElement(xml, ref index);
-                    node.Children.Add(childNode);
-                }
-                else
-                {
-                    node.InnerText += ParseTextContent(xml, ref index);
-                }
-            }
             index += 2;
             SkipWhitespace(xml, ref index);
             string closingTagName = ParseTagName(xml, ref index);
@@ -183,7 +145,7 @@ namespace ConsoleApp2
             return node;
         }
 
-        public string ParseTagName(string xml, ref int index)
+        private string ParseTagName(string xml, ref int index)
         {
             int start = index;
             while (index < xml.Length && (char.IsLetterOrDigit(xml[index]) || xml[index] == ':' || xml[index] == '_'))
@@ -193,7 +155,7 @@ namespace ConsoleApp2
             return xml.Substring(start, index - start);
         }
 
-        public (string, string) ParseAttribute(string xml, ref int index)
+        private (string, string) ParseAttribute(string xml, ref int index)
         {
             string name = ParseTagName(xml, ref index);
 
@@ -212,9 +174,7 @@ namespace ConsoleApp2
             int start = index;
 
             while (index < xml.Length && xml[index] != '"')
-            {
                 index++;
-            }
 
             string value = xml.Substring(start, index - start);
             index++;
@@ -222,22 +182,62 @@ namespace ConsoleApp2
             return (name, value);
         }
 
-        public string ParseTextContent(string xml, ref int index)
+        private string ParseTextContent(string xml, ref int index)
         {
             int start = index;
+
             while (index < xml.Length && xml[index] != '<')
-            {
                 index++;
-            }
+
             return xml.Substring(start, index - start).Trim();
         }
 
-        public void SkipWhitespace(string xml, ref int index)
+        private void SkipWhitespace(string xml, ref int index)
         {
             while (index < xml.Length && char.IsWhiteSpace(xml[index]))
-            {
                 index++;
+        }
+
+        private void HandleInnerContext(string xml, ref int index, XmlNode node)
+        {
+            while (xml[index] != '<' || xml[index + 1] != '/')
+            {
+                if (xml[index] == '<')
+                {
+                    HandleChildElement(xml, ref index, node);
+                }
+                else
+                {
+                    HandleInnerContent(xml, ref index, node);
+                }
             }
+        }
+
+        private void HandleInnerContent(string xml, ref int index, XmlNode node) =>
+            node.InnerText += ParseTextContent(xml, ref index);
+
+        private void HandleChildElement(string xml, ref int index, XmlNode node)
+        {
+            var childNode = ParseElement(xml, ref index);
+            node.Children.Add(childNode);
+        }
+
+        private void HandleAttribute(string xml, ref int index, XmlNode node)
+        {
+            while (xml[index] != '>' && xml[index] != '/')
+            {
+                SkipWhitespace(xml, ref index);
+                if (xml[index] != '>' && xml[index] != '/')
+                {
+                    var (attrName, attrValue) = ParseAttribute(xml, ref index);
+                    node.Attributes[attrName] = attrValue;
+                }
+            }
+        }
+
+        private bool EndOfTag(char symbol)
+        {
+            return symbol == '/' ? true : false;
         }
     }
 }

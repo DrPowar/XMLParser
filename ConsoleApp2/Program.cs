@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Text;
 
-//BenchmarkSwitcher
-//    .FromAssembly(Assembly.GetExecutingAssembly())
-//    .Run(args);
+BenchmarkSwitcher
+    .FromAssembly(Assembly.GetExecutingAssembly())
+    .Run(args);
 
 namespace ConsoleApp2
 {
@@ -27,6 +27,7 @@ namespace ConsoleApp2
 
             XMLParser parser = new XMLParser();
 
+            //Показує всі дані які є в бібліотеці
             Library library = parser.ParseLibrary(s);
 
             library.IntroduceLibrary();
@@ -42,7 +43,7 @@ namespace ConsoleApp2
 
                 var borrowedBookIds = member.BorrowedBooks.Select(b => b.Id).ToList();
 
-                var borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((int)b.Id)).ToList();
+                var borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
 
                 foreach (var book in borrowedBooks)
                 {

@@ -7,12 +7,15 @@ namespace ConsoleApp2
     [ShortRunJob]
     public class Benchmark
     {
-        public string xml;
+        private string xml;
+
+        private XMLParser xmlParser;
 
         [GlobalSetup]
         public void GlobalSetup()
         {
             xml = GetXMLFile();
+            xmlParser = new XMLParser();
         }
 
         [Benchmark]
@@ -36,9 +39,7 @@ namespace ConsoleApp2
         [Benchmark]
         public Library GetLibraryFromXml()
         {
-            XMLParser parser = new XMLParser();
-
-            return parser.ParseLibrary(xml);
+            return xmlParser.ParseLibrary(xml);
         } 
     }
 }

@@ -4,7 +4,6 @@ namespace ConsoleApp2
 {
     public class XMLParser
     {
-
         public Library ParseLibrary(string xml)
         {
             XmlNode libraryNode = GetNodeTree(xml);

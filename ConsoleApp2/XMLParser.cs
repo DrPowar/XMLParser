@@ -1,24 +1,28 @@
-﻿namespace ConsoleApp2
+﻿using BenchmarkDotNet.Attributes;
+
+namespace ConsoleApp2
 {
-    internal static class XMLParser
+    public class XMLParser
     {
-        public static Library ParseLibrary(string xml)
+        public readonly string? XML = "<   Library >\r\n  < Books>\r\n    <Book id=\"1\" genre=\"fiction\">\r\n      <Title>The Great Gatsby</Title>\r\n      <Author>F. Scott Fitzgerald</Author>\r\n      <PublicationDate>1925</PublicationDate>\r\n      <Chapters>\r\n        <Chapter number=\"1\">\r\n          <Title>Chapter One</Title>\r\n          <Content>This is the content of chapter one...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"2\">\r\n          <Title>Chapter Two</Title>\r\n          <Content>This is the content of chapter two...</Content>\r\n        </Chapter>\r\n      </Chapters>\r\n    </Book>\r\n    <Book id=\"2\" genre=\"fiction\">\r\n      <Title>To Kill a Mockingbird</Title>\r\n      <Author>Harper Lee</Author>\r\n      <PublicationDate>1960</PublicationDate>\r\n      <Chapters>\r\n        <Chapter number=\"1\">\r\n          <Title>Chapter One</Title>\r\n          <Content>This is the content of chapter one...</Content>\r\n        </Chapter>\r\n        < Chapter number=\"2\">\r\n          <Title>Chapter Two</Title>\r\n          <Content>This is the content of chapter two...</Content>\r\n        </Chapter>\r\n      </Chapters>\r\n    </Book>\r\n    <Book id=\"3\" genre=\"fiction\">\r\n      <Title>1984</Title>\r\n      <Author>George Orwell</Author>\r\n      <PublicationDate>1949</PublicationDate>\r\n      <Chapters>\r\n        <Chapter number=\"1\">\r\n          <Title>Chapter One</Title>\r\n          <Content>This is the content of chapter one...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"2\">\r\n          <Title>Chapter Two</Title>\r\n          <Content>This is the content of chapter two...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"3\">\r\n          <Title>Chapter Three</Title>\r\n          <Content>This is the content of chapter three...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"4\">\r\n          <Title>Chapter Four</Title>\r\n          <Content>This is the content of chapter four...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"5\">\r\n          <Title>Chapter Five</Title>\r\n          <Content>This is the content of chapter five...</Content>\r\n        </Chapter>\r\n      </Chapters>\r\n    </Book>\r\n    <Book id=\"4\" genre=\"fantasy\">\r\n      <Title>Harry Potter and the Sorcerer's Stone</Title>\r\n      <Author>J.K. Rowling</Author>\r\n      <PublicationDate>1997</PublicationDate>\r\n      <Chapters>\r\n        <Chapter number=\"1\">\r\n          <Title>Chapter One</Title>\r\n          <Content>This is the content of chapter one...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"2\">\r\n          <Title>Chapter Two</Title>\r\n          <Content>This is the content of chapter two...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"3\">\r\n          <Title>Chapter Three</Title>\r\n          <Content>This is the content of chapter three...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"4\">\r\n          <Title>Chapter Four</Title>\r\n          <Content>This is the content of chapter four...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"5\">\r\n          <Title>Chapter Five</Title>\r\n          <Content>This is the content of chapter five...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"6\">\r\n          <Title>Chapter Six</Title>\r\n          <Content>This is the content of chapter six...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"7\">\r\n          <Title>Chapter Seven</Title>\r\n          <Content>This is the content of chapter seven...</Content>\r\n        </Chapter>\r\n      </Chapters>\r\n    </Book>\r\n    <Book id=\"5\" genre=\"science fiction\">\r\n      <Title>Dune</Title>\r\n      <Author>Frank Herbert</Author>\r\n      <PublicationDate>1965</PublicationDate>\r\n      <Chapters>\r\n        <Chapter number=\"1\">\r\n          <Title>Chapter One</Title>\r\n          <Content>This is the content of chapter one...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"2\">\r\n          <Title>Chapter Two</Title>\r\n          <Content>This is the content of chapter two...</Content>\r\n        </Chapter>\r\n        <Chapter number=\"3\">\r\n          <Title>Chapter Three</Title>\r\n          <Content>This is the content of chapter three...</Content>\r\n        </Chapter>\r\n      </Chapters>\r\n    </Book>\r\n  </Books>\r\n  <Members>\r\n    <Member id=\"1001\">\r\n      <Name>John Doe</Name>\r\n      <MembershipDate>2021-01-15</MembershipDate>\r\n      <BooksBorrowed>\r\n        <Book id=\"1\" dueDate=\"2021-02-15\"/>\r\n      </BooksBorrowed>\r\n    </Member>\r\n  </Members>\r\n</Library>";
+
+        public Library ParseLibrary()
         {
-            XmlNode libraryNode = GetNodeTree(xml);
+            XmlNode libraryNode = GetNodeTree(XML);
             Library library = new Library();
 
-            foreach(var child in libraryNode.Children)
+            foreach (var child in libraryNode.Children)
             {
-                if(child.Name == "Books")
+                if (child.Name == "Books")
                 {
-                    foreach(var book in child.Children)
+                    foreach (var book in child.Children)
                     {
                         library.Books.Add(ParseBook(book));
                     }
                 }
-                else if(child.Name == "Members")
+                else if (child.Name == "Members")
                 {
-                    foreach(var member in child.Children)
+                    foreach (var member in child.Children)
                     {
                         library.Members.Add(ParseMember(member));
                     }
@@ -27,7 +31,7 @@
             return library;
         }
 
-        private static Book ParseBook(XmlNode node)
+        public Book ParseBook(XmlNode node)
         {
             Book book = new Book();
 
@@ -65,7 +69,7 @@
             return book;
         }
 
-        private static Chapter ParseChapter(XmlNode node)
+        public Chapter ParseChapter(XmlNode node)
         {
             var chapter = new Chapter
             {
@@ -83,7 +87,7 @@
             return chapter;
         }
 
-        private static Member ParseMember(XmlNode memberNode)
+        public Member ParseMember(XmlNode memberNode)
         {
             var member = new Member
             {
@@ -109,7 +113,7 @@
             return member;
         }
 
-        private static BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
+        public BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
         {
             BorrowedBook book = new BorrowedBook()
             {
@@ -120,13 +124,13 @@
             return book;
         }
 
-        private static XmlNode GetNodeTree(string xml)
+        public XmlNode GetNodeTree(string xml)
         {
             int index = 0;
             return ParseElement(xml, ref index);
         }
 
-        private static XmlNode ParseElement(string xml, ref int index)
+        public XmlNode ParseElement(string xml, ref int index)
         {
             SkipWhitespace(xml, ref index);
 
@@ -181,7 +185,7 @@
             return node;
         }
 
-        private static string ParseTagName(string xml, ref int index)
+        public string ParseTagName(string xml, ref int index)
         {
             int start = index;
             while (index < xml.Length && (char.IsLetterOrDigit(xml[index]) || xml[index] == ':' || xml[index] == '_'))
@@ -191,7 +195,7 @@
             return xml.Substring(start, index - start);
         }
 
-        private static (string, string) ParseAttribute(string xml, ref int index)
+        public (string, string) ParseAttribute(string xml, ref int index)
         {
             string name = ParseTagName(xml, ref index);
 
@@ -220,7 +224,7 @@
             return (name, value);
         }
 
-        private static string ParseTextContent(string xml, ref int index)
+        public string ParseTextContent(string xml, ref int index)
         {
             int start = index;
             while (index < xml.Length && xml[index] != '<')
@@ -230,7 +234,7 @@
             return xml.Substring(start, index - start).Trim();
         }
 
-        private static void SkipWhitespace(string xml, ref int index)
+        public void SkipWhitespace(string xml, ref int index)
         {
             while (index < xml.Length && char.IsWhiteSpace(xml[index]))
             {

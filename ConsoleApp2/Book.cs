@@ -1,14 +1,16 @@
-﻿namespace ConsoleApp2
+﻿using BenchmarkDotNet.Attributes;
+
+namespace ConsoleApp2
 {
-    internal sealed class Book
+    public sealed class Book
     {
         public uint Id { get; set; }
 
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
-        public string Genre { get; set; }
+        public string? Genre { get; set; }
 
-        public string Author { get; set; }
+        public string? Author { get; set; }
 
         public uint PublicationDate { get; set; }
 

@@ -1,4 +1,10 @@
-﻿using System.Text;
+﻿using BenchmarkDotNet.Running;
+using System.Reflection;
+using System.Text;
+
+BenchmarkSwitcher
+    .FromAssembly(Assembly.GetExecutingAssembly())
+    .Run(args);
 
 namespace ConsoleApp2
 {
@@ -6,6 +12,8 @@ namespace ConsoleApp2
     {
         static void Main()
         {
+
+
             string file = "C:\\Users\\User\\Desktop\\LibraryXML_test.txt";
             StringBuilder sb = new StringBuilder();
             using (StreamReader sr = new StreamReader(file))
@@ -19,7 +27,12 @@ namespace ConsoleApp2
             string s = sb.ToString();
             sb.Clear();
 
-            Library library = XMLParser.ParseLibrary(s);
+            XMLParser parser = new XMLParser();
+
+            Library library = parser.ParseLibrary();
+
+            var summary = BenchmarkRunner.Run<XMLParser>();
+
             library.IntroduceLibrary();
 
             //Скільки всьо чаптерів в бібліотеці

@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
 using ConsoleApp2.Entities;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 

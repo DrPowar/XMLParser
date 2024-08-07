@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ConsoleApp2
 {
+    [ShortRunJob]
     [MemoryDiagnoser]
     public class Benchmark
     {

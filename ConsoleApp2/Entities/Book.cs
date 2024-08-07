@@ -22,7 +22,6 @@ namespace ConsoleApp2.Entities
         {
             return $"Id: {Id}, Title: {Title}, Genre: {Genre}, Author: {Author}, Publication Date: {PublicationDate}, Chapters Count: {Chapters.Count}";
         }
-
     }
 }
 

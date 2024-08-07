@@ -1,12 +1,12 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Collections.Immutable;
 
-namespace ConsoleApp2
+namespace ConsoleApp2.Entities
 {
     public sealed record Member
     {
-        public uint Id { get; set; }  
-        
+        public uint Id { get; set; }
+
         public string? Name { get; set; }
 
         public DateTime MembershipDate { get; set; }

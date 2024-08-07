@@ -1,4 +1,6 @@
-﻿namespace ConsoleApp2
+﻿using ConsoleApp2.Entities;
+
+namespace ConsoleApp2
 {
     public class XMLParser
     {

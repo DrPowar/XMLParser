@@ -1,10 +1,11 @@
 ﻿using BenchmarkDotNet.Running;
+using ConsoleApp2.Entities;
 using System.Reflection;
 using System.Text;
 
-BenchmarkSwitcher
-    .FromAssembly(Assembly.GetExecutingAssembly())
-    .Run(args);
+//BenchmarkSwitcher
+//    .FromAssembly(Assembly.GetExecutingAssembly())
+//    .Run(args);
 
 namespace ConsoleApp2
 {
@@ -12,9 +13,8 @@ namespace ConsoleApp2
     {
         static void Main()
         {
-            string file = "C:\\Users\\User\\Desktop\\LibraryXML.txt";
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(file))
+            using (StreamReader sr = new StreamReader(FilePathConst.FilePath))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)

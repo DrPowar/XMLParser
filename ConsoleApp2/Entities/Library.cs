@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Collections.Immutable;
 
-namespace ConsoleApp2
+namespace ConsoleApp2.Entities
 {
     public sealed record Library
     {
@@ -34,6 +34,6 @@ namespace ConsoleApp2
                 }
             }
         }
-  
+
     }
 }

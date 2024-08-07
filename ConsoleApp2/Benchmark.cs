@@ -1,10 +1,10 @@
 ﻿using BenchmarkDotNet.Attributes;
+using ConsoleApp2.Entities;
 using System.Text;
 
 namespace ConsoleApp2
 {
     [MemoryDiagnoser]
-    [ShortRunJob]
     public class Benchmark
     {
         private string xml;
@@ -21,9 +21,8 @@ namespace ConsoleApp2
         [Benchmark]
         public string GetXMLFile()
         {
-            string file = "C:\\Users\\User\\Desktop\\LibraryXML_test.txt";
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(file))
+            using (StreamReader sr = new StreamReader(FilePathConst.FilePath))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)

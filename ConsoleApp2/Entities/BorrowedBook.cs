@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 
-namespace ConsoleApp2
+namespace ConsoleApp2.Entities
 {
     public sealed record BorrowedBook
     {

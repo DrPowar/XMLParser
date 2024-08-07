@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Collections.Immutable;
 
-namespace ConsoleApp2
+namespace ConsoleApp2.Entities
 {
     public sealed record Book
     {
@@ -13,6 +13,7 @@ namespace ConsoleApp2
 
         public string? Author { get; set; }
 
+        //Тут uint тому, що вхідні дані завжди містять тільки рік і DateTime не вийде зпарсити
         public uint PublicationDate { get; set; }
 
         public List<Chapter> Chapters { get; set; } = new List<Chapter>();

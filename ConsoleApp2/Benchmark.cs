@@ -13,11 +13,14 @@ namespace ConsoleApp2
 
         private XMLParser? xmlParser;
 
+        private XMLValidator? xmlValidator;
+
         [GlobalSetup]
         public void GlobalSetup()
         {
             xml = GetXMLFile();
             xmlParser = new XMLParser();
+            xmlValidator = new XMLValidator();
         }
 
         [Benchmark]
@@ -35,6 +38,12 @@ namespace ConsoleApp2
             string s = sb.ToString();
             sb.Clear();
             return s;
+        }
+
+        [Benchmark]
+        public ValidationResult IsXMLValid()
+        {
+            return xmlValidator!.IsValid(xml!);
         }
 
         [Benchmark]

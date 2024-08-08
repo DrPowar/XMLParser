@@ -18,7 +18,7 @@ namespace ConsoleApp2
         {
             SkipWhitespace(xml, ref index);
 
-            if (xml[index] != XMLSymbolsConst.XmlOpeningTag)
+            if (xml[index] != XMLSymbolsConst.XmlTagOnpening)
                 return new ValidationResult(false, ValidationMessageConst.OpeningTagMissing);
 
             index++;
@@ -139,7 +139,7 @@ namespace ConsoleApp2
         {
             int start = index;
 
-            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlOpeningTag)
+            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlTagOnpening)
                 index++;
 
             return new ValidationResult(true, ValidationMessageConst.Success);
@@ -147,9 +147,9 @@ namespace ConsoleApp2
 
         private ValidationResult IsValidInnerContext(string xml, ref int index)
         {
-            while (xml[index] != XMLSymbolsConst.XmlOpeningTag || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
+            while (xml[index] != XMLSymbolsConst.XmlTagOnpening || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
             {
-                if (xml[index] == XMLSymbolsConst.XmlOpeningTag)
+                if (xml[index] == XMLSymbolsConst.XmlTagOnpening)
                 {
                     ValidationResult validationResult = IsValidChildElement(xml, ref index);
                     if (!validationResult.Result)

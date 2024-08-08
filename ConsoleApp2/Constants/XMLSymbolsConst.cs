@@ -2,7 +2,7 @@
 {
     internal class XMLSymbolsConst
     {
-        internal const char XmlOpeningTag = '<';
+        internal const char XmlTagOnpening = '<';
         internal const char XmlSelfClosingSlash = '/';
         internal const char XmlTagCloseBracket = '>';
         internal const char Colon = ':';

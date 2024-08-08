@@ -143,7 +143,7 @@ namespace ConsoleApp2
         {
             SkipWhitespace(xml, ref index);
 
-            if (xml[index] != XMLSymbolsConst.XmlOpeningTag)
+            if (xml[index] != XMLSymbolsConst.XmlTagOnpening)
                 throw new Exception("Expected '<'");
 
             index++;
@@ -228,7 +228,7 @@ namespace ConsoleApp2
         {
             int start = index;
 
-            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlOpeningTag)
+            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlTagOnpening)
                 index++;
 
             return xml.Substring(start, index - start).Trim();
@@ -242,9 +242,9 @@ namespace ConsoleApp2
 
         private void HandleInnerContext(string xml, ref int index, XmlNode node)
         {
-            while (xml[index] != XMLSymbolsConst.XmlOpeningTag || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
+            while (xml[index] != XMLSymbolsConst.XmlTagOnpening || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
             {
-                if (xml[index] == XMLSymbolsConst.XmlOpeningTag)
+                if (xml[index] == XMLSymbolsConst.XmlTagOnpening)
                 {
                     HandleChildElement(xml, ref index, node);
                 }

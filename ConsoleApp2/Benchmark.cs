@@ -24,7 +24,7 @@ namespace ConsoleApp2
         public string GetXMLFile()
         {
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(FilePathConst.FilePath))
+            using (StreamReader sr = new StreamReader(FilePathConst.ValidFilePath))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)

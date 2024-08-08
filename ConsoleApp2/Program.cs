@@ -1,12 +1,13 @@
 ﻿using BenchmarkDotNet.Running;
 using ConsoleApp2.Constants;
 using ConsoleApp2.Entities;
+using ConsoleApp2.Exceptions;
 using System.Reflection;
 using System.Text;
 
-BenchmarkSwitcher
-    .FromAssembly(Assembly.GetExecutingAssembly())
-    .Run(args);
+//BenchmarkSwitcher
+//    .FromAssembly(Assembly.GetExecutingAssembly())
+//    .Run(args);
 
 namespace ConsoleApp2
 {
@@ -15,7 +16,7 @@ namespace ConsoleApp2
         static void Main()
         {
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(FilePathConst.FilePath))
+            using (StreamReader sr = new StreamReader(FilePathConst.ValidFilePath))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)
@@ -28,9 +29,22 @@ namespace ConsoleApp2
 
             XMLParser parser = new XMLParser();
 
-            //Показує всі дані які є в бібліотеці
-            Library library = parser.ParseLibrary(s);
+            Library library = new Library(new List<Book>(), new List<Member>());
 
+
+            XMLValidator xMLValidator = new XMLValidator();
+
+            try
+            {
+                library = parser.ParseLibrary(s);
+            }
+            catch(InvalidXMLException e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(1);
+            }
+
+            //Показує всі дані які є в бібліотеці
             library.IntroduceLibrary();
 
             //Скільки всьо чаптерів в бібліотеці

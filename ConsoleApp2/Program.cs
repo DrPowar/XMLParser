@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Running;
+using ConsoleApp2.Constants;
 using ConsoleApp2.Entities;
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Text;
 
@@ -34,17 +34,17 @@ namespace ConsoleApp2
             library.IntroduceLibrary();
 
             //Скільки всьо чаптерів в бібліотеці
-            var totalChapters = library.Books.SelectMany(b => b.Chapters).Count();
+            int totalChapters = library.Books.SelectMany(b => b.Chapters).Count();
             Console.WriteLine($"\n\nAll books in the library have a total of {totalChapters} chapters.");
 
             //Які книги хто позичив
-            foreach (var member in library.Members)
+            foreach (Member member in library.Members)
             {
                 Console.WriteLine($"\n\nMember {member.Id} borrowed the following books:");
 
-                var borrowedBookIds = member.BorrowedBooks.Select(b => b.Id).ToList();
+                List<uint> borrowedBookIds = member.BorrowedBooks.Select(b => b.Id).ToList();
 
-                var borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
+                List<Book> borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
 
                 foreach (var book in borrowedBooks)
                 {
@@ -54,10 +54,10 @@ namespace ConsoleApp2
 
             //Книги відсортовані за жанром
             Console.WriteLine("\n\nBooks sorted by genre:");
-            var sortedBooks = library.Books
+            List<Book> sortedBooks = library.Books
             .OrderBy(b => b.Genre)
             .ToList();
-            foreach (var book in sortedBooks)
+            foreach (Book book in sortedBooks)
             {
                 Console.WriteLine(book.ToString());
             }

@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using ConsoleApp2.Constants;
 using ConsoleApp2.Entities;
 using System.Text;
 
@@ -8,9 +9,9 @@ namespace ConsoleApp2
     [MemoryDiagnoser]
     public class Benchmark
     {
-        private string xml;
+        private string? xml;
 
-        private XMLParser xmlParser;
+        private XMLParser? xmlParser;
 
         [GlobalSetup]
         public void GlobalSetup()
@@ -39,7 +40,7 @@ namespace ConsoleApp2
         [Benchmark]
         public Library GetLibraryFromXml()
         {
-            return xmlParser.ParseLibrary(xml);
+            return xmlParser!.ParseLibrary(xml!);
         } 
     }
 }

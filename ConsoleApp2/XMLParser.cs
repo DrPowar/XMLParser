@@ -1,5 +1,5 @@
-﻿using ConsoleApp2.Entities;
-using Microsoft.VisualBasic;
+﻿using ConsoleApp2.Constants;
+using ConsoleApp2.Entities;
 
 namespace ConsoleApp2
 {
@@ -11,12 +11,12 @@ namespace ConsoleApp2
             List<Book> books = new List<Book>();
             List<Member> members = new List<Member>();
 
-            foreach (var child in libraryNode.Children)
+            foreach (XmlNode child in libraryNode.Children)
             {
-                if (child.Name == "Books")
+                if (child.Name == LibraryConst.Books)
                     books.AddRange(child.Children.Select(b => ParseBook(b)));
 
-                else if (child.Name == "Members")
+                else if (child.Name == LibraryConst.Members)
                     members.AddRange(child.Children.Select(m => ParseMember(m)));
             }
 
@@ -32,29 +32,29 @@ namespace ConsoleApp2
             uint publicationDate = 0;
             List<Chapter> chapters = new List<Chapter>();
 
-            foreach(var attribute in node.Attributes)
+            foreach(KeyValuePair<string, string> attribute in node.Attributes)
             {
-                if(attribute.Key == "id")
+                if(attribute.Key == BookConst.Id)
                     id = uint.Parse(attribute.Value);
 
-                else if(attribute.Key == "genre")
+                else if(attribute.Key == BookConst.Genre)
                     genre = attribute.Value;
             }
 
-            foreach(var child in node.Children)
+            foreach(XmlNode child in node.Children)
             {
                 switch(child.Name)
                 {
-                    case "Title":
+                    case BookConst.Title:
                         title = child.InnerText;
                         break;
-                    case "Author":
+                    case BookConst.Author:
                         author = child.InnerText;
                         break;
-                    case "PublicationDate":
+                    case BookConst.PublicationDate:
                         publicationDate = uint.Parse(child.InnerText);
                         break;
-                    case "Chapters":
+                    case BookConst.Chapters:
                         chapters.AddRange(child.Children.Select(c => ParseChapter(c)));
                         break;
                 }
@@ -68,14 +68,14 @@ namespace ConsoleApp2
             string title = string.Empty;
             string content = string.Empty;
 
-            number = uint.Parse(node.Attributes["number"]);
+            number = uint.Parse(node.Attributes[ChapterConst.Number]);
 
-            foreach (var child in node.Children)
+            foreach (XmlNode child in node.Children)
             {
-                if (child.Name == "Title")
+                if (child.Name == ChapterConst.Title)
                     title = child.InnerText;
 
-                else if (child.Name == "Content")
+                else if (child.Name == ChapterConst.Content)
                     content = child.InnerText;
             }
             return new Chapter(number, title, content);
@@ -88,17 +88,17 @@ namespace ConsoleApp2
             DateTime membershipDate = DateTime.MinValue;
             List<BorrowedBook> borrowedBooks = new List<BorrowedBook>();
 
-            id = uint.Parse(memberNode.Attributes["id"]);
+            id = uint.Parse(memberNode.Attributes[MemberConst.Id]);
 
-            foreach (var child in memberNode.Children)
+            foreach (XmlNode child in memberNode.Children)
             {
-                if (child.Name == "Name")
+                if (child.Name == MemberConst.Name)
                     name = child.InnerText;
 
-                else if (child.Name == "MembershipDate")
+                else if (child.Name == MemberConst.MembershipDate)
                     membershipDate = DateTime.Parse(child.InnerText);
 
-                else if (child.Name == "BooksBorrowed")
+                else if (child.Name == MemberConst.BooksBorrowed)
                     borrowedBooks.AddRange(child.Children.Select(b => ParseBorrowedBook(b)));
             }
             return new Member(id, name, membershipDate, borrowedBooks);
@@ -106,8 +106,8 @@ namespace ConsoleApp2
 
         private BorrowedBook ParseBorrowedBook(XmlNode borrowedBookNode)
         {
-            uint id = uint.Parse(borrowedBookNode.Attributes["id"]);
-            DateTime dueDate = DateTime.Parse(borrowedBookNode.Attributes["dueDate"]);
+            uint id = uint.Parse(borrowedBookNode.Attributes[BorrowedBookConst.Id]);
+            DateTime dueDate = DateTime.Parse(borrowedBookNode.Attributes[BorrowedBookConst.DueDate]);
 
             return new BorrowedBook(id, dueDate);
         }
@@ -122,7 +122,7 @@ namespace ConsoleApp2
         {
             SkipWhitespace(xml, ref index);
 
-            if (xml[index] != '<')
+            if (xml[index] != XMLSymbolsConst.XmlOpeningTag)
                 throw new Exception("Expected '<'");
 
             index++;
@@ -195,7 +195,7 @@ namespace ConsoleApp2
         {
             int start = index;
 
-            while (index < xml.Length && xml[index] != '<')
+            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlOpeningTag)
                 index++;
 
             return xml.Substring(start, index - start).Trim();
@@ -209,9 +209,9 @@ namespace ConsoleApp2
 
         private void HandleInnerContext(string xml, ref int index, XmlNode node)
         {
-            while (xml[index] != '<' || xml[index + 1] != '/')
+            while (xml[index] != XMLSymbolsConst.XmlOpeningTag || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
             {
-                if (xml[index] == '<')
+                if (xml[index] == XMLSymbolsConst.XmlOpeningTag)
                 {
                     HandleChildElement(xml, ref index, node);
                 }
@@ -227,16 +227,16 @@ namespace ConsoleApp2
 
         private void HandleChildElement(string xml, ref int index, XmlNode node)
         {
-            var childNode = ParseElement(xml, ref index);
+            XmlNode childNode = ParseElement(xml, ref index);
             node.Children.Add(childNode);
         }
 
         private void HandleAttribute(string xml, ref int index, XmlNode node)
         {
-            while (xml[index] != '>' && xml[index] != '/')
+            while (xml[index] != XMLSymbolsConst.XmlTagCloseBracket && xml[index] != XMLSymbolsConst.XmlSelfClosingSlash)
             {
                 SkipWhitespace(xml, ref index);
-                if (xml[index] != '>' && xml[index] != '/')
+                if (xml[index] != XMLSymbolsConst.XmlTagCloseBracket && xml[index] != XMLSymbolsConst.XmlSelfClosingSlash)
                 {
                     var (attrName, attrValue) = ParseAttribute(xml, ref index);
                     node.Attributes[attrName] = attrValue;
@@ -246,7 +246,7 @@ namespace ConsoleApp2
 
         private bool EndOfTag(char symbol)
         {
-            return symbol == '/' ? true : false;
+            return symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;
         }
     }
 }

@@ -5,8 +5,6 @@ namespace ConsoleApp2.Entities
 {
     public sealed record Library(List<Book> Books, List<Member> Members)
     {
-
-
         public void IntroduceLibrary()
         {
             Console.WriteLine("Library:");

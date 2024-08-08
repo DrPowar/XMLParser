@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp2
+﻿namespace ConsoleApp2.Constants
 {
     internal static class FilePathConst
     {

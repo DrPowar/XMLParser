@@ -146,7 +146,7 @@ namespace ConsoleApp2
         {
             SkipWhitespace(xml, ref index);
 
-            index++;
+            SkipOpeningSymbol(xml, ref index);
             string tagName = ParseTagName(xml, ref index);
 
             XmlNode node = new XmlNode { Name = tagName };
@@ -155,30 +155,51 @@ namespace ConsoleApp2
 
             if (IsTagClosed(xml[index]))
             {
-                index += 2; //Skip />
+                SkipAutoClosingSymbols(xml, ref index);
                 return node;
             }
 
-            index++;
+            SkipClosingSymbol(xml, ref index);
             HandleInnerContext(xml, ref index, node);
 
-            index += 2;
+            SkipTagClosingSymbols(xml, ref index);
             SkipWhitespace(xml, ref index);
             string closingTagName = ParseTagName(xml, ref index);
 
+            SkipClosingSymbol(xml, ref index);
             SkipEndOfElementSymbols(xml, ref index);
 
             return node;
         }
 
-        /// <summary>
-        /// Skip end of element symols: \r \n \0
-        /// </summary>
-        /// <param name="xml"></param>
-        /// <param name="index"></param>
+        private void SkipAutoClosingSymbols(string xml, ref int index)
+        {
+            if (xml[index] == XMLSymbolsConst.XmlSelfClosingSlash && xml[index + 1] == XMLSymbolsConst.XmlTagCloseBracket)
+                index += 2;
+        }
+
+        private void SkipTagClosingSymbols(string xml, ref int index)
+        {
+            if (xml[index] == XMLSymbolsConst.XmlTagOnpening && xml[index + 1] == XMLSymbolsConst.XmlSelfClosingSlash)
+                index += 2;
+        }
+
         private void SkipEndOfElementSymbols(string xml, ref int index)
         {
-            index += 3;
+            if (xml[index] == XMLSymbolsConst.CarriageReturn && xml[index + 1] == XMLSymbolsConst.NextLineSymbol)
+                index += 2;
+        }
+
+        private void SkipClosingSymbol(string xml, ref int index)
+        {
+            if (xml[index] == XMLSymbolsConst.XmlTagCloseBracket)
+                index++;
+        }
+
+        private void SkipOpeningSymbol(string xml, ref int index)
+        {
+            if (xml[index] == XMLSymbolsConst.XmlTagOnpening)
+                index++;
         }
 
         private string ParseTagName(string xml, ref int index)

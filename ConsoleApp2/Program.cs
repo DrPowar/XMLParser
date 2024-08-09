@@ -16,7 +16,7 @@ namespace ConsoleApp2
         static void Main()
         {
             StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(FilePathConst.ValidFilePath))
+            using (StreamReader sr = new StreamReader(FilePathConst.ExtendedFilePath))
             {
                 string line;
                 while ((line = sr.ReadLine()) != null)

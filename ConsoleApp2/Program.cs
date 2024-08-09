@@ -15,7 +15,7 @@ namespace ConsoleApp2
     {
         static void Main()
         {
-            string xml = GetXMLFile(FilePathConst.ExtendedFilePath);
+            string xml = GetXMLFile(FilePathConst.InvalidFilePath);
 
             XMLParser parser = new XMLParser();
 

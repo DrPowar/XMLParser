@@ -47,7 +47,7 @@ namespace ConsoleApp2
         }
 
         [Benchmark]
-        public Library GetLibraryFromXml()
+        public List<Library> GetLibraryFromXml()
         {
             return xmlParser!.ParseLibrary(xml!);
         } 

@@ -29,14 +29,14 @@ namespace ConsoleApp2
 
             XMLParser parser = new XMLParser();
 
-            Library library = new Library(new List<Book>(), new List<Member>());
+            List<Library> libs = new List<Library>();
 
 
             XMLValidator xMLValidator = new XMLValidator();
 
             try
             {
-                library = parser.ParseLibrary(s);
+                libs = parser.ParseLibrary(s);
             }
             catch(InvalidXMLException e)
             {
@@ -45,35 +45,47 @@ namespace ConsoleApp2
             }
 
             //Показує всі дані які є в бібліотеці
-            library.IntroduceLibrary();
+            foreach(Library library in libs)
+            {
+                library.IntroduceLibrary();
+            }
 
             //Скільки всьо чаптерів в бібліотеці
-            int totalChapters = library.Books.SelectMany(b => b.Chapters).Count();
-            Console.WriteLine($"\n\nAll books in the library have a total of {totalChapters} chapters.");
+            foreach (Library library in libs)
+            {
+                int totalChapters = library.Books.SelectMany(b => b.Chapters).Count();
+                Console.WriteLine($"\n\nAll books in the library have a total of {totalChapters} chapters.");
+            }
 
             //Які книги хто позичив
-            foreach (Member member in library.Members)
+            foreach (Library library in libs)
             {
-                Console.WriteLine($"\n\nMember {member.Id} borrowed the following books:");
-
-                List<uint> borrowedBookIds = member.BorrowedBooks.Select(b => b.Id).ToList();
-
-                List<Book> borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
-
-                foreach (var book in borrowedBooks)
+                foreach (Member member in library.Members)
                 {
-                    Console.WriteLine($"- {book.Title}");
+                    Console.WriteLine($"\n\nMember {member.Id} borrowed the following books:");
+
+                    List<uint> borrowedBookIds = member.BorrowedBooks.Select(b => b.Id).ToList();
+
+                    List<Book> borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
+
+                    foreach (var book in borrowedBooks)
+                    {
+                        Console.WriteLine($"- {book.Title}");
+                    }
                 }
             }
 
             //Книги відсортовані за жанром
-            Console.WriteLine("\n\nBooks sorted by genre:");
-            List<Book> sortedBooks = library.Books
-            .OrderBy(b => b.Genre)
-            .ToList();
-            foreach (Book book in sortedBooks)
+            foreach (Library library in libs)
             {
-                Console.WriteLine(book.ToString());
+                Console.WriteLine("\n\nBooks sorted by genre:");
+                List<Book> sortedBooks = library.Books
+                .OrderBy(b => b.Genre)
+                .ToList();
+                foreach (Book book in sortedBooks)
+                {
+                    Console.WriteLine(book.ToString());
+                }
             }
         }
     }

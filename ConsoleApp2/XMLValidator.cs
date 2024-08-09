@@ -9,29 +9,33 @@ namespace ConsoleApp2
         {
             int index = 0;
 
-            ValidationResult result = IsValidElement(xml, ref index);
+            while (index < xml.Length)
+            {
+                ValidationResult result = IsValidElement(xml, ref index);
+                if(!result.Result)
+                {
+                    return result;
+                }
+            }
 
-            return result;
+            return new ValidationResult(true, ValidationMessageConst.Success);
         }
+
 
         private ValidationResult IsValidElement(string xml, ref int index)
         {
             SkipWhitespace(xml, ref index);
 
             if (xml[index] != XMLSymbolsConst.XmlTagOnpening)
-                return new ValidationResult(false, ValidationMessageConst.OpeningTagMissing);
+                return new ValidationResult(false, ValidationMessageConst.OpeningTagMissing + GetFullLine(xml, index));
 
             index++;
 
             if(!TryParseTagName(xml, ref index, out string tagName))
-            {
-                return new ValidationResult(false, ValidationMessageConst.InvalidTag);
-            }
+                return new ValidationResult(false, ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
 
             if (!IsValidAttributes(xml, ref index))
-            {
-                return new ValidationResult(false, ValidationMessageConst.InvalidTag);
-            }
+                return new ValidationResult(false, ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
 
             if (IsTagClosed(xml[index]))
             {
@@ -43,25 +47,31 @@ namespace ConsoleApp2
 
             ValidationResult innerContextValidationResult = IsValidInnerContext(xml, ref index);
             if(!innerContextValidationResult.Result)
-            {
                 return innerContextValidationResult;
-            }
 
             index += 2;
-            SkipWhitespace(xml, ref index);
 
-            if (!TryParseTagName(xml, ref index, out string closingTagName))
+            if (!TryParseClosingTagName(xml, ref index, out string closingTagName))
             {
-                return new ValidationResult(false, ValidationMessageConst.InvalidTag);
+                return new ValidationResult(false, ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
             }
 
 
             if (closingTagName != tagName)
-                return new ValidationResult(false, ValidationMessageConst.MismatchTagNames);
+                return new ValidationResult(false, ValidationMessageConst.MismatchTagNames + GetFullLine(xml, index));
 
-            index++;
+            SkipEndOfElementSymbols(xml, ref index);
+            return new ValidationResult(true, ValidationMessageConst.Success);
+        }
 
-            return new ValidationResult(true, ValidationMessageConst.MismatchTagNames);
+        /// <summary>
+        /// Skip end of element symols: \r \n \0
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="index"></param>
+        private void SkipEndOfElementSymbols(string xml, ref int index)
+        {
+            index += 3;
         }
 
         private void SkipWhitespace(string xml, ref int index)
@@ -76,10 +86,10 @@ namespace ConsoleApp2
 
             int start = index;
 
-            if (index >= xml.Length || !IsXMLSymbolValid(xml[index]))
+            if (index >= xml.Length || !IsXMLTagSymbolValid(xml[index]))
                 return false;
 
-            while (index < xml.Length && IsXMLSymbolValid(xml[index]))
+            while (index < xml.Length && IsXMLTagSymbolValid(xml[index]))
             {
                 index++;
             }
@@ -89,30 +99,51 @@ namespace ConsoleApp2
             return true;
         }
 
+        private bool TryParseClosingTagName(string xml, ref int index, out string closingTagName)
+        {
+            closingTagName = string.Empty;
+
+            int start = index;
+
+            if (index >= xml.Length || !IsXMLTagSymbolValid(xml[index]))
+                return false;
+
+            while (index < xml.Length && IsXMLTagSymbolValid(xml[index]))
+            {
+                index++;
+            }
+
+            if (xml[index] != XMLSymbolsConst.XmlTagCloseBracket)
+                return false;
+
+            closingTagName = xml.Substring(start, index - start);
+
+            return true;
+        }
+
 
         private bool IsValidTagName(string xml, ref int index)
         {
             int start = index;
 
-            if (!IsXMLSymbolValid(xml[index]))
+            if (!IsXMLTagSymbolValid(xml[index]))
                 return false;
 
-            while (index < xml.Length && IsXMLSymbolValid(xml[index]))
+            while (index < xml.Length && IsXMLTagSymbolValid(xml[index]))
             {
                 index++;
             }
             return true;
         }
 
-        private bool IsXMLSymbolValid(char symbol) =>
+        private bool IsXMLTagSymbolValid(char symbol) =>
            (char.IsLetterOrDigit(symbol) || symbol == XMLSymbolsConst.Colon || symbol == XMLSymbolsConst.Underscore);
 
         private bool IsValidAttribute(string xml, ref int index)
         {
             if (!IsValidTagName(xml, ref index))
-            {
                 return false;
-            }
+
             SkipWhitespace(xml, ref index);
 
             if (xml[index] != XMLSymbolsConst.AttributeEqualSign)
@@ -127,7 +158,7 @@ namespace ConsoleApp2
             index++;
             int start = index;
 
-            while (index < xml.Length && xml[index] != '"')
+            while (index < xml.Length && xml[index] != XMLSymbolsConst.AttributeValueDelimiterSign)
                 index++;
 
             index++;
@@ -215,7 +246,6 @@ namespace ConsoleApp2
 
             return xml.Substring(lineStart, lineEnd - lineStart);
         }
-
 
         private bool IsEndOfTag(char symbol) =>
             symbol == XMLSymbolsConst.XmlTagCloseBracket || symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;

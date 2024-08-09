@@ -6,29 +6,41 @@ namespace ConsoleApp2
 {
     public class XMLParser
     {
-        public Library ParseLibrary(string xml)
+        public List<Library> ParseLibrary(string xml)
         {
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
             if (validation.Result)
             {
-                XmlNode libraryNode = new XmlNode();
-                libraryNode = GetNodeTree(xml);
+                int index = 0;
 
-                List<Book> books = new List<Book>();
-                List<Member> members = new List<Member>();
+                List<XmlNode> nodes = new List<XmlNode>();
 
-                foreach (XmlNode child in libraryNode.Children)
+                while (index < xml.Length)
                 {
-                    if (child.Name == LibraryConst.Books)
-                        books.AddRange(child.Children.Select(b => ParseBook(b)));
-
-                    else if (child.Name == LibraryConst.Members)
-                        members.AddRange(child.Children.Select(m => ParseMember(m)));
+                    nodes.Add(GetNodeTree(xml, ref index));
                 }
 
-                return new Library(books, members);
+                List<Library> libs = new List<Library>();
+
+                foreach(XmlNode node in nodes)
+                {
+                    List<Book> books = new List<Book>();
+                    List<Member> members = new List<Member>();
+
+                    foreach (XmlNode child in node.Children)
+                    {
+                        if (child.Name == LibraryConst.Books)
+                            books.AddRange(child.Children.Select(b => ParseBook(b)));
+
+                        else if (child.Name == LibraryConst.Members)
+                            members.AddRange(child.Children.Select(m => ParseMember(m)));
+                    }
+                    libs.Add(new Library(books, members));
+                }
+
+                return libs;
             }
             else
             {
@@ -125,40 +137,21 @@ namespace ConsoleApp2
             return new BorrowedBook(id, dueDate);
         }
 
-        private XmlNode GetNodeTree(string xml)
+        private XmlNode GetNodeTree(string xml, ref int index)
         {
-            int index = 0;
-
-            try
-            {
-                return ParseElement(xml, ref index);
-            }
-            catch(InvalidXMLException e)
-            {
-                throw e;
-            }
+            return ParseElement(xml, ref index);
         }
 
         private XmlNode ParseElement(string xml, ref int index)
         {
             SkipWhitespace(xml, ref index);
 
-            if (xml[index] != XMLSymbolsConst.XmlTagOnpening)
-                throw new Exception("Expected '<'");
-
             index++;
             string tagName = ParseTagName(xml, ref index);
 
             XmlNode node = new XmlNode { Name = tagName };
 
-            try
-            {
-                HandleAttribute(xml, ref index, node);
-            }
-            catch(InvalidXMLException e)
-            {
-                throw e;
-            }
+            HandleAttribute(xml, ref index, node);
 
             if (IsTagClosed(xml[index]))
             {
@@ -173,20 +166,24 @@ namespace ConsoleApp2
             SkipWhitespace(xml, ref index);
             string closingTagName = ParseTagName(xml, ref index);
 
-            if (closingTagName != tagName)
-                throw new Exception("Mismatched closing tag");
-
-            index++;
+            SkipEndOfElementSymbols(xml, ref index);
 
             return node;
+        }
+
+        /// <summary>
+        /// Skip end of element symols: \r \n \0
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <param name="index"></param>
+        private void SkipEndOfElementSymbols(string xml, ref int index)
+        {
+            index += 3;
         }
 
         private string ParseTagName(string xml, ref int index)
         {
             int start = index;
-
-            if (!IsXMLSymbolValid(xml[index]))
-                throw new InvalidXMLException();
 
             while (index < xml.Length && IsXMLSymbolValid(xml[index]))
             {
@@ -203,14 +200,8 @@ namespace ConsoleApp2
             string name = ParseTagName(xml, ref index);
             SkipWhitespace(xml, ref index);
 
-            if (xml[index] != XMLSymbolsConst.AttributeEqualSign)
-                throw new Exception("Expected '=' in attribute");
-
             index++;
             SkipWhitespace(xml, ref index);
-
-            if (xml[index] != XMLSymbolsConst.AttributeValueDelimiterSign)
-                throw new Exception("Expected '\"' in attribute value");
 
             index++;
             int start = index;
@@ -267,10 +258,6 @@ namespace ConsoleApp2
         private void HandleAttribute(string xml, ref int index, XmlNode node)
         {
             SkipWhitespace(xml, ref index);
-            if (IsEndOfTag(xml[index]) && char.IsWhiteSpace(xml[index - 1])) // If current character is a closing character and the previous character is a whitespace, the tag is invalid
-            {
-                throw new InvalidXMLException("Invalid tag in next line: " + GetFullLine(xml, index));
-            }
 
             while (!IsEndOfTag(xml[index]))
             {
@@ -280,29 +267,8 @@ namespace ConsoleApp2
                     var (attrName, attrValue) = ParseAttribute(xml, ref index);
                     node.Attributes[attrName] = attrValue;
                 }
-                else if (char.IsWhiteSpace(xml[index - 1]))
-                {
-                    throw new InvalidXMLException("Invalid tag in next line: " + GetFullLine(xml, index));
-                }
             }
         }
-
-        private string GetFullLine(string xml, int index)
-        {
-            int lineStart = xml.LastIndexOf('\n', index - 1);
-            if (lineStart == -1)
-                lineStart = 0;
-            else
-                lineStart++;
-
-            int lineEnd = xml.IndexOf('\n', index - 1);
-
-            if (lineEnd == -1)
-                lineEnd = xml.Length;
-
-            return xml.Substring(lineStart, lineEnd - lineStart);
-        }
-
 
         private bool IsEndOfTag(char symbol) =>
             symbol == XMLSymbolsConst.XmlTagCloseBracket || symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;

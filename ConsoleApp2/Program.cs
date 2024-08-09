@@ -15,28 +15,17 @@ namespace ConsoleApp2
     {
         static void Main()
         {
-            StringBuilder sb = new StringBuilder();
-            using (StreamReader sr = new StreamReader(FilePathConst.ExtendedFilePath))
-            {
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    sb.AppendLine(line);
-                }
-            }
-            string s = sb.ToString();
-            sb.Clear();
+            string xml = GetXMLFile(FilePathConst.ExtendedFilePath);
 
             XMLParser parser = new XMLParser();
 
             List<Library> libs = new List<Library>();
 
-
             XMLValidator xMLValidator = new XMLValidator();
 
             try
             {
-                libs = parser.ParseLibrary(s);
+                libs = parser.ParseXML(xml);
             }
             catch(InvalidXMLException e)
             {
@@ -51,14 +40,43 @@ namespace ConsoleApp2
             }
 
             //Скільки всьо чаптерів в бібліотеці
-            foreach (Library library in libs)
+            GetAllChpaters(libs);
+
+            //Які книги хто позичив
+            BorrowedBooks(libs);
+
+            //Книги відсортовані за жанром
+            SortedByGenreBooks(libs);
+        }
+
+        private static string GetXMLFile(string file)
+        {
+            StringBuilder sb = new StringBuilder();
+            using (StreamReader sr = new StreamReader(file))
+            {
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    sb.AppendLine(line);
+                }
+            }
+            string s = sb.ToString();
+
+            return s;
+        }
+
+        private static void GetAllChpaters(List<Library> libraries)
+        {
+            foreach (Library library in libraries)
             {
                 int totalChapters = library.Books.SelectMany(b => b.Chapters).Count();
                 Console.WriteLine($"\n\nAll books in the library have a total of {totalChapters} chapters.");
             }
+        }
 
-            //Які книги хто позичив
-            foreach (Library library in libs)
+        private static void BorrowedBooks(List<Library> libraries)
+        {
+            foreach (Library library in libraries)
             {
                 foreach (Member member in library.Members)
                 {
@@ -68,15 +86,17 @@ namespace ConsoleApp2
 
                     List<Book> borrowedBooks = library.Books.Where(b => borrowedBookIds.Contains((uint)b.Id)).ToList();
 
-                    foreach (var book in borrowedBooks)
+                    foreach (Book book in borrowedBooks)
                     {
                         Console.WriteLine($"- {book.Title}");
                     }
                 }
             }
+        }
 
-            //Книги відсортовані за жанром
-            foreach (Library library in libs)
+        private static void SortedByGenreBooks(List<Library> libraries)
+        {
+            foreach (Library library in libraries)
             {
                 Console.WriteLine("\n\nBooks sorted by genre:");
                 List<Book> sortedBooks = library.Books

@@ -6,46 +6,51 @@ namespace ConsoleApp2
 {
     public class XMLParser
     {
-        public List<Library> ParseLibrary(string xml)
+        public List<Library> ParseXML(string xml)
         {
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
-            if (validation.Result)
+            if(validation.Result)
             {
-                int index = 0;
-
-                List<XmlNode> nodes = new List<XmlNode>();
-
-                while (index < xml.Length)
-                {
-                    nodes.Add(GetNodeTree(xml, ref index));
-                }
-
-                List<Library> libs = new List<Library>();
-
-                foreach(XmlNode node in nodes)
-                {
-                    List<Book> books = new List<Book>();
-                    List<Member> members = new List<Member>();
-
-                    foreach (XmlNode child in node.Children)
-                    {
-                        if (child.Name == LibraryConst.Books)
-                            books.AddRange(child.Children.Select(b => ParseBook(b)));
-
-                        else if (child.Name == LibraryConst.Members)
-                            members.AddRange(child.Children.Select(m => ParseMember(m)));
-                    }
-                    libs.Add(new Library(books, members));
-                }
-
-                return libs;
+                return ParseLibrary(xml);
             }
             else
             {
                 throw new InvalidXMLException(validation.ValidationMessage);
             }
+        }
+
+        public List<Library> ParseLibrary(string xml)
+        {
+            int index = 0;
+
+            List<XmlNode> nodes = new List<XmlNode>();
+
+            while (index < xml.Length)
+            {
+                nodes.Add(GetNodeTree(xml, ref index));
+            }
+
+            List<Library> libs = new List<Library>();
+
+            foreach (XmlNode node in nodes)
+            {
+                List<Book> books = new List<Book>();
+                List<Member> members = new List<Member>();
+
+                foreach (XmlNode child in node.Children)
+                {
+                    if (child.Name == LibraryConst.Books)
+                        books.AddRange(child.Children.Select(b => ParseBook(b)));
+
+                    else if (child.Name == LibraryConst.Members)
+                        members.AddRange(child.Children.Select(m => ParseMember(m)));
+                }
+                libs.Add(new Library(books, members));
+            }
+
+            return libs;
         }
 
         private Book ParseBook(XmlNode node)
@@ -227,7 +232,7 @@ namespace ConsoleApp2
             index++;
             int start = index;
 
-            while (index < xml.Length && xml[index] != '"')
+            while (index < xml.Length && xml[index] != XMLSymbolsConst.AttributeValueDelimiterSign)
                 index++;
 
             string value = xml.Substring(start, index - start);
@@ -298,128 +303,3 @@ namespace ConsoleApp2
             symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;
     }
 }
-
-//< Library >
-//  < Books >
-//    < Book id = "1" genre = "fiction" >
-//      < Title > The Great Gatsby</Title>
-//      <Author>F.Scott Fitzgerald</Author>
-//      <PublicationDate>1925</PublicationDate>
-//      <Chapters>
-//        <Chapter number = "1" >
-//          < Title > Chapter One</Title>
-//          <Content>This is the content of chapter one...</Content>
-//        </Chapter>
-//        <Chapter number = "2" >
-//          < Title > Chapter Two</Title>
-//          <Content>This is the content of chapter two...</Content>
-//        </Chapter>
-//      </Chapters>
-//    </Book>
-//    <Book id = "2" genre= "fiction" >
-//      < Title > To Kill a Mockingbird</Title>
-//      <Author>Harper Lee</Author>
-//      <PublicationDate>1960</PublicationDate>
-//      <Chapters>
-//        <Chapter number = "1" >
-//          < Title > Chapter One</Title>
-//          <Content>This is the content of chapter one...</Content>
-//        </Chapter>
-//        <Chapter number = "2" >
-//          < Title > Chapter Two</Title>
-//          <Content>This is the content of chapter two...</Content>
-//        </Chapter>
-//      </Chapters>
-//    </Book>
-//    <Book id = "3" genre= "fiction" >
-//      < Title > 1984 </ Title >
-//      < Author > George Orwell</Author>
-//      <PublicationDate>1949</PublicationDate>
-//      <Chapters>
-//        <Chapter number = "1" >
-//          < Title > Chapter One</Title>
-//          <Content>This is the content of chapter one...</Content>
-//        </Chapter>
-//        <Chapter number = "2" >
-//          < Title > Chapter Two</Title>
-//          <Content>This is the content of chapter two...</Content>
-//        </Chapter>
-//        <Chapter number = "3" >
-//          < Title > Chapter Three</Title>
-//          <Content>This is the content of chapter three...</Content>
-//        </Chapter>
-//        <Chapter number = "4" >
-//          < Title > Chapter Four</Title>
-//          <Content>This is the content of chapter four...</Content>
-//        </Chapter>
-//        <Chapter number = "5" >
-//          < Title > Chapter Five</Title>
-//          <Content>This is the content of chapter five...</Content>
-//        </Chapter>
-//      </Chapters>
-//    </Book>
-//    <Book id = "4" genre= "fantasy" >
-//      < Title > Harry Potter and the Sorcerer's Stone</Title>
-//      <Author>J.K.Rowling</Author>
-//      <PublicationDate>1997</PublicationDate>
-//      <Chapters>
-//        <Chapter number = "1" >
-//          < Title > Chapter One</Title>
-//          <Content>This is the content of chapter one...</Content>
-//        </Chapter>
-//        <Chapter number = "2" >
-//          < Title > Chapter Two</Title>
-//          <Content>This is the content of chapter two...</Content>
-//        </Chapter>
-//        <Chapter number = "3" >
-//          < Title > Chapter Three</Title>
-//          <Content>This is the content of chapter three...</Content>
-//        </Chapter>
-//        <Chapter number = "4" >
-//          < Title > Chapter Four</Title>
-//          <Content>This is the content of chapter four...</Content>
-//        </Chapter>
-//        <Chapter number = "5" >
-//          < Title > Chapter Five</Title>
-//          <Content>This is the content of chapter five...</Content>
-//        </Chapter>
-//        <Chapter number = "6" >
-//          < Title > Chapter Six</Title>
-//          <Content>This is the content of chapter six...</Content>
-//        </Chapter>
-//        <Chapter number = "7" >
-//          < Title > Chapter Seven</Title>
-//          <Content>This is the content of chapter seven...</Content>
-//        </Chapter>
-//      </Chapters>
-//    </Book>
-//    <Book id = "5" genre= "science fiction" >
-//      < Title > Dune </ Title >
-//      < Author > Frank Herbert</Author>
-//      <PublicationDate>1965</PublicationDate>
-//      <Chapters>
-//        <Chapter number = "1" >
-//          < Title > Chapter One</Title>
-//          <Content>This is the content of chapter one...</Content>
-//        </Chapter>
-//        <Chapter number = "2" >
-//          < Title > Chapter Two</Title>
-//          <Content>This is the content of chapter two...</Content>
-//        </Chapter>
-//        <Chapter number = "3" >
-//          < Title > Chapter Three</Title>
-//          <Content>This is the content of chapter three...</Content>
-//        </Chapter>
-//      </Chapters>
-//    </Book>
-//  </Books>
-//  <Members>
-//    <Member id = "1001" >
-//      < Name > John Doe</Name>
-//      <MembershipDate>2021-01-15</MembershipDate>
-//      <BooksBorrowed>
-//        <Book id = "1" dueDate= "2021-02-15" />
-//      </ BooksBorrowed >
-//    </ Member >
-//  </ Members >
-//</ Library >

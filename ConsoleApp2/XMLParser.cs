@@ -11,14 +11,15 @@ namespace ConsoleApp2
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
-            if(validation.Result)
-            {
-                return ParseLibrary(xml);
-            }
-            else
-            {
-                throw new InvalidXMLException(validation.ValidationMessage);
-            }
+            //if(validation.Result)
+            //{
+            //    return ParseLibrary(xml);
+            //}
+            //else
+            //{
+            //    throw new InvalidXMLException(validation.ValidationMessage);
+            //}
+            return new List<Library>();
         }
 
         public List<Library> ParseLibrary(string xml)
@@ -149,9 +150,9 @@ namespace ConsoleApp2
 
         private XmlNode ParseElement(string xml, ref int index)
         {
-            SkipWhitespace(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
 
-            SkipOpeningSymbol(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.XmlTagOnpeningBracket);
             string tagName = ParseTagName(xml, ref index);
 
             XmlNode node = new XmlNode { Name = tagName };
@@ -160,51 +161,40 @@ namespace ConsoleApp2
 
             if (IsTagClosed(xml[index]))
             {
-                SkipAutoClosingSymbols(xml, ref index);
+                SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.XmlTagCloseBracket, XMLSymbols.XmlSelfClosingSlash });
                 return node;
             }
 
-            SkipClosingSymbol(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
             HandleInnerContext(xml, ref index, node);
 
-            SkipTagClosingSymbols(xml, ref index);
-            SkipWhitespace(xml, ref index);
+            SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.XmlTagOnpeningBracket, XMLSymbols.XmlSelfClosingSlash });
+            SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
             string closingTagName = ParseTagName(xml, ref index);
 
-            SkipClosingSymbol(xml, ref index);
-            SkipEndOfElementSymbols(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
+            SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.NextLineSymbol, XMLSymbols.CarriageReturn });
 
             return node;
         }
 
-        private void SkipAutoClosingSymbols(string xml, ref int index)
+        private void SkipSymbol(string xml, ref int index, XMLSymbols symbol)
         {
-            if (xml[index] == XMLSymbolsConst.XmlSelfClosingSlash && xml[index + 1] == XMLSymbolsConst.XmlTagCloseBracket)
-                index += 2;
-        }
-
-        private void SkipTagClosingSymbols(string xml, ref int index)
-        {
-            if (xml[index] == XMLSymbolsConst.XmlTagOnpening && xml[index + 1] == XMLSymbolsConst.XmlSelfClosingSlash)
-                index += 2;
-        }
-
-        private void SkipEndOfElementSymbols(string xml, ref int index)
-        {
-            if (xml[index] == XMLSymbolsConst.CarriageReturn && xml[index + 1] == XMLSymbolsConst.NextLineSymbol)
-                index += 2;
-        }
-
-        private void SkipClosingSymbol(string xml, ref int index)
-        {
-            if (xml[index] == XMLSymbolsConst.XmlTagCloseBracket)
+            if (xml[index] == (char)symbol)
+            {
                 index++;
+            }
         }
 
-        private void SkipOpeningSymbol(string xml, ref int index)
+        private void SkipSymbols(string xml, ref int index, List<XMLSymbols> symbols)
         {
-            if (xml[index] == XMLSymbolsConst.XmlTagOnpening)
-                index++;
+            for (int i = 0; i < symbols.Count; i++)
+            {
+                if (symbols.Contains((XMLSymbols)xml[index]))
+                {
+                    index++;
+                }
+            }
         }
 
         private string ParseTagName(string xml, ref int index)
@@ -219,20 +209,20 @@ namespace ConsoleApp2
         }
 
         private bool IsXMLSymbolValid(char symbol) =>
-            (char.IsLetterOrDigit(symbol) || symbol == XMLSymbolsConst.Colon || symbol == XMLSymbolsConst.Underscore);
+            (char.IsLetterOrDigit(symbol) || symbol == (char)XMLSymbols.Colon || symbol == (char)XMLSymbols.Underscore);
 
         private (string, string) ParseAttribute(string xml, ref int index)
         {
             string name = ParseTagName(xml, ref index);
-            SkipWhitespace(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
 
             index++;
-            SkipWhitespace(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
 
             index++;
             int start = index;
 
-            while (index < xml.Length && xml[index] != XMLSymbolsConst.AttributeValueDelimiterSign)
+            while (index < xml.Length && xml[index] != (char)XMLSymbols.AttributeValueDelimiterSign)
                 index++;
 
             string value = xml.Substring(start, index - start);
@@ -245,23 +235,17 @@ namespace ConsoleApp2
         {
             int start = index;
 
-            while (index < xml.Length && xml[index] != XMLSymbolsConst.XmlTagOnpening)
+            while (index < xml.Length && xml[index] != (char)XMLSymbols.XmlTagOnpeningBracket)
                 index++;
 
             return xml.Substring(start, index - start).Trim();
         }
 
-        private void SkipWhitespace(string xml, ref int index)
-        {
-            while (index < xml.Length && char.IsWhiteSpace(xml[index]))
-                index++;
-        }
-
         private void HandleInnerContext(string xml, ref int index, XmlNode node)
         {
-            while (xml[index] != XMLSymbolsConst.XmlTagOnpening || xml[index + 1] != XMLSymbolsConst.XmlSelfClosingSlash)
+            while (xml[index] != (char)XMLSymbols.XmlTagOnpeningBracket || xml[index + 1] != (char)XMLSymbols.XmlSelfClosingSlash)
             {
-                if (xml[index] == XMLSymbolsConst.XmlTagOnpening)
+                if (xml[index] == (char)XMLSymbols.XmlTagOnpeningBracket)
                 {
                     HandleChildElement(xml, ref index, node);
                 }
@@ -283,11 +267,11 @@ namespace ConsoleApp2
 
         private void HandleAttribute(string xml, ref int index, XmlNode node)
         {
-            SkipWhitespace(xml, ref index);
+            SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
 
             while (!IsEndOfTag(xml[index]))
             {
-                SkipWhitespace(xml, ref index);
+                SkipSymbol(xml, ref index, XMLSymbols.Whitespace);
                 if (!IsEndOfTag(xml[index]))
                 {
                     var (attrName, attrValue) = ParseAttribute(xml, ref index);
@@ -297,9 +281,9 @@ namespace ConsoleApp2
         }
 
         private bool IsEndOfTag(char symbol) =>
-            symbol == XMLSymbolsConst.XmlTagCloseBracket || symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;
+            symbol == (char)XMLSymbols.XmlTagCloseBracket || symbol == (char)XMLSymbols.XmlSelfClosingSlash ? true : false;
 
         private bool IsTagClosed(char symbol) =>
-            symbol == XMLSymbolsConst.XmlSelfClosingSlash ? true : false;
+            symbol == (char)XMLSymbols.XmlSelfClosingSlash ? true : false;
     }
 }

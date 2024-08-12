@@ -17,13 +17,13 @@ namespace ConsoleApp2
             while (index < xml.Length)
             {
                 ValidationResult result = IsValidElement(xml, ref index);
-                if(!result.Result)
+                if(result.Result == ValidationResultType.CriticalFailure)
                 {
                     return result;
                 }
             }
 
-            return new ValidationResult(true, ValidationMessageConst.Success);
+            return new ValidationResult(ValidationResultType.Success, ValidationMessageConst.Success);
         }
 
         private ValidationResult IsValidElement(string xml, ref int index)
@@ -36,7 +36,7 @@ namespace ConsoleApp2
 
             if (xml[index] != (char)XMLSymbols.XmlTagOnpeningBracket)
             {
-                return new ValidationResult(false, ValidationMessageConst.OpeningTagMissing);
+                return new ValidationResult(ValidationResultType.CriticalFailure, ValidationMessageConst.OpeningTagMissing + GetFullLine(xml, index));
             }
 
             nodeTracker.PushStart((uint)index);
@@ -61,16 +61,16 @@ namespace ConsoleApp2
 
                 nodeTracker.PopEnd((uint)index);
 
-                return new ValidationResult(true, ValidationMessageConst.Success);
+                return new ValidationResult(ValidationResultType.Success, ValidationMessageConst.Success);
             }
 
             SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
 
             ValidationResult innerContextValidationResult = IsValidInnerContext(xml, ref index);
-            //if (!innerContextValidationResult.Result)
-            //{
-            //    return innerContextValidationResult;
-            //}
+            if (innerContextValidationResult.Result == ValidationResultType.CriticalFailure)
+            {
+                return innerContextValidationResult;
+            }
 
             SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.XmlTagOnpeningBracket, XMLSymbols.XmlSelfClosingSlash });
 
@@ -82,8 +82,7 @@ namespace ConsoleApp2
 
             if (closingTagName != tagName)
             {
-                errors.Add(ValidationMessageConst.MismatchTagNames);
-                nodeTracker.IsValid = false;
+                return new ValidationResult(ValidationResultType.CriticalFailure, ValidationMessageConst.MismatchTagNames + GetFullLine(xml, index));
             }
 
             SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
@@ -97,27 +96,14 @@ namespace ConsoleApp2
 
             if (nodeTracker.IsValid)
             {
-                return new ValidationResult(true, ValidationMessageConst.Success);
+                return new ValidationResult(ValidationResultType.Success, ValidationMessageConst.Success);
             }
             else
             {
                 _errors.Add(new Tuple<uint, uint>(nodeTracker.Start, nodeTracker.End), errors);
-                return new ValidationResult(false, errors.First());
+                return new ValidationResult(ValidationResultType.Failure, errors.First());
             }
         }
-
-        private string GetTagName(string xml, ref int index)
-        {
-            int startIndex = index + 1;
-            while (index < xml.Length && xml[index] != ' ' && xml[index] != (char)XMLSymbols.XmlTagCloseBracket)
-            {
-                index++;
-            }
-            return xml.Substring(startIndex, index - startIndex);
-        }
-
-
-
 
         private void SkipSymbol(string xml, ref int index, XMLSymbols symbol)
         {
@@ -247,32 +233,33 @@ namespace ConsoleApp2
             {
                 index++;
             }
-            return new ValidationResult(true, ValidationMessageConst.Success);
+            return new ValidationResult(ValidationResultType.Success, ValidationMessageConst.Success);
         }
 
         private ValidationResult IsValidInnerContext(string xml, ref int index)
         {
+            string a = xml.Substring(index - 5, 5);
             while (xml[index] != (char)XMLSymbols.XmlTagOnpeningBracket || xml[index + 1] != (char)XMLSymbols.XmlSelfClosingSlash)
             {
                 if (xml[index] == (char)XMLSymbols.XmlTagOnpeningBracket)
                 {
                     ValidationResult validationResult = IsValidChildElement(xml, ref index);
-                    //if (!validationResult.Result)
-                    //{
-                    //    return validationResult;
-                    //}
+                    if (validationResult.Result == ValidationResultType.CriticalFailure)
+                    {
+                        return validationResult;
+                    }
                 }
                 else
                 {
                     ValidationResult validationResult = IsValidInnerContent(xml, ref index);
-                    if (!validationResult.Result)
+                    if (validationResult.Result == ValidationResultType.CriticalFailure)
                     {
                         return validationResult;
                     }
                 }
             }
 
-            return new ValidationResult(true, ValidationMessageConst.Success);
+            return new ValidationResult(ValidationResultType.Success, ValidationMessageConst.Success);
         }
 
         private ValidationResult IsValidInnerContent(string xml, ref int index) =>

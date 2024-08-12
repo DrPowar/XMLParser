@@ -1,4 +1,4 @@
 ﻿namespace ConsoleApp2
 {
-    public record ValidationResult(bool Result, string ValidationMessage);
+    public record ValidationResult(ValidationResultType Result, string ValidationMessage);
 }

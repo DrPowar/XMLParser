@@ -11,15 +11,31 @@ namespace ConsoleApp2
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
-            //if(validation.Result)
-            //{
-            //    return ParseLibrary(xml);
-            //}
-            //else
-            //{
-            //    throw new InvalidXMLException(validation.ValidationMessage);
-            //}
-            return new List<Library>();
+            var sortedTuples = xMLValidator.Errors.Keys.OrderBy(tuple => tuple.Item1).ToList();
+
+            for (int i = 0; i < xml.Length; i++)
+            {
+                foreach (var tuple in sortedTuples)
+                {
+                    if (i == tuple.Item1)
+                    {
+                        i = (int)tuple.Item2;
+                        break;
+                    }
+                }
+
+                Console.WriteLine($"Current index: {i}");
+            }
+
+
+            if (validation.Result == ValidationResultType.CriticalFailure)
+            {
+                throw new InvalidXMLException("Critical failure: " + validation.ValidationMessage);
+            }
+            else
+            {
+                return ParseLibrary(xml);
+            }
         }
 
         public List<Library> ParseLibrary(string xml)

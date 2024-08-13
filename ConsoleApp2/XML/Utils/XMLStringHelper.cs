@@ -1,5 +1,7 @@
 ﻿using ConsoleApp2.Constants;
+using ConsoleApp2.XMLUtils;
 using ConsoleApp2.XMLUtils.Models;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ConsoleApp2.XML.Utils
@@ -87,15 +89,16 @@ namespace ConsoleApp2.XML.Utils
             }
         }
 
-        public static string RemoveInvalidNodes(string xml, List<NodeRange> invalidNodes)
+        public static string RemoveInvalidNodes(string xml, Dictionary<NodeRange, List<string>> errors)
         {
+            List<NodeRange> invalidNodesRange = errors.Keys.ToList();
             StringBuilder sb = new(xml);
 
-            invalidNodes.Sort((a, b) => b.End.CompareTo(a.End));
+            invalidNodesRange.Sort((a, b) => b.End.CompareTo(a.End));
 
-            foreach (NodeRange range in invalidNodes)
+            foreach (NodeRange range in invalidNodesRange)
             {
-                sb.Remove((int)range.Start, (int)(range.End - range.Start + 1));
+                sb.Remove((int)range.Start, (int)(range.End - range.Start));
             }
 
             return sb.ToString();

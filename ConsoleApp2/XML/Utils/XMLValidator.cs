@@ -1,5 +1,6 @@
 ﻿using ConsoleApp2.Constants;
 using ConsoleApp2.XMLUtils.Models;
+using System.Collections.Generic;
 using static ConsoleApp2.XML.Utils.XMLStringHelper;
 
 namespace ConsoleApp2.XMLUtils
@@ -13,6 +14,7 @@ namespace ConsoleApp2.XMLUtils
         public ValidationResult IsValid(string xml)
         {
             int index = 0;
+
 
             while (index < xml.Length)
             {
@@ -79,13 +81,13 @@ namespace ConsoleApp2.XMLUtils
 
             if (!TryParseTagName(xml, ref index, out tagName))
             {
-                errors.Add(ValidationMessageConst.InvalidTag);
+                errors.Add(ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
                 nodeTracker.IsValid = false;
             }
 
             if (!IsValidAttributes(xml, ref index))
             {
-                errors.Add(ValidationMessageConst.InvalidTag);
+                errors.Add(ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
                 nodeTracker.IsValid = false;
             }
 
@@ -104,7 +106,7 @@ namespace ConsoleApp2.XMLUtils
 
             if (!TryParseClosingTagName(xml, ref index, out string closingTagName))
             {
-                errors.Add(ValidationMessageConst.InvalidTag);
+                errors.Add(ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
                 nodeTracker.IsValid = false;
                 return false;
             }
@@ -131,28 +133,31 @@ namespace ConsoleApp2.XMLUtils
             }
         }
 
-        private bool IsNodeContained(NodeRange nodeNodeRange)
+        private bool IsNodeContained(NodeRange nodeRange)
         {
-            return _errors.Keys.Any(NodeRange => NodeRange.Start <= nodeNodeRange.Start && NodeRange.End >= nodeNodeRange.End);
+            return _errors.Keys.Any(NodeRange => NodeRange.Start <= nodeRange.Start && NodeRange.End >= nodeRange.End);
         }
 
-        private void RemoveContainedNodes(NodeRange nodeNodeRange)
+        private void RemoveContainedNodes(NodeRange nodeRange, List<string> errors)
         {
-            List<NodeRange> containedNodes = _errors.Keys.Where(NodeRange => NodeRange.Start >= nodeNodeRange.Start && NodeRange.End <= nodeNodeRange.End).ToList();
+            List<KeyValuePair<NodeRange, List<string>>> containedNodes = _errors
+                .Where(pair => pair.Key.Start >= nodeRange.Start && pair.Key.End <= nodeRange.End)
+                .ToList();
 
-            foreach (NodeRange NodeRange in containedNodes)
+            foreach (KeyValuePair<NodeRange, List<string>> pair in containedNodes)
             {
-                _errors.Remove(NodeRange);
+                errors.AddRange(pair.Value);
+                _errors.Remove(pair.Key);
             }
         }
 
-        private void AddOrReplaceNode(NodeRange nodeNodeRange, List<string> errors)
+        private void AddOrReplaceNode(NodeRange nodeRange, List<string> errors)
         {
-            RemoveContainedNodes(nodeNodeRange);
+            RemoveContainedNodes(nodeRange, errors);
 
-            if (!IsNodeContained(nodeNodeRange))
+            if (!IsNodeContained(nodeRange))
             {
-                _errors.Add(nodeNodeRange, errors);
+                _errors.Add(nodeRange, errors);
             }
         }
 

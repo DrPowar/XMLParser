@@ -15,13 +15,21 @@ namespace ConsoleApp2.XML.Utils
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
-            List<NodeRange> invalidNodesRange = xMLValidator.Errors.Keys.ToList();
+            xml = RemoveInvalidNodes(xml, xMLValidator.Errors);
 
-            xml = RemoveInvalidNodes(xml, invalidNodesRange);
 
             if (validation.Result == ValidationResultType.CriticalFailure)
             {
                 throw new InvalidXMLException("Critical failure: " + validation.ValidationMessage);
+            }
+            else if(xMLValidator.Errors.Count > 0)
+            {
+                foreach(List<string> errorList in xMLValidator.Errors.Values)
+                {
+                    PrintErrors(errorList);
+                }
+
+                return ParseLibrary(xml);
             }
             else
             {
@@ -184,6 +192,15 @@ namespace ConsoleApp2.XML.Utils
                     var (attrName, attrValue) = ParseAttribute(xml, ref index);
                     node.Attributes[attrName] = attrValue;
                 }
+            }
+        }
+
+        private void PrintErrors(List<string> errors)
+        {
+            Console.WriteLine("Document contained next errors:");
+            foreach (string error in errors)
+            {
+                Console.WriteLine(error);
             }
         }
     }

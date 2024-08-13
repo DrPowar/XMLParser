@@ -2,11 +2,11 @@
 using ConsoleApp2.Entities;
 using ConsoleApp2.Exceptions;
 using ConsoleApp2.Parsers;
-using System;
-using System.Text;
-using static ConsoleApp2.XMLUtils.XMLStringHelper;
+using ConsoleApp2.XMLUtils;
+using ConsoleApp2.XMLUtils.Models;
+using static ConsoleApp2.XML.Utils.XMLStringHelper;
 
-namespace ConsoleApp2.XMLUtils
+namespace ConsoleApp2.XML.Utils
 {
     public class XMLParser
     {
@@ -15,9 +15,9 @@ namespace ConsoleApp2.XMLUtils
             XMLValidator xMLValidator = new XMLValidator();
             ValidationResult validation = xMLValidator.IsValid(xml);
 
-            List<Range> invalidNodesRange = xMLValidator.Errors.Keys.ToList();
+            List<NodeRange> invalidNodesRange = xMLValidator.Errors.Keys.ToList();
 
-            xml = RemoveInvalidNodes(xml, invalidNodesRange); 
+            xml = RemoveInvalidNodes(xml, invalidNodesRange);
 
             if (validation.Result == ValidationResultType.CriticalFailure)
             {
@@ -109,7 +109,7 @@ namespace ConsoleApp2.XMLUtils
 
             while (index < xml.Length && IsXMLTagSymbolValid(xml[index]))
             {
-                index++;    
+                index++;
             }
             return xml.Substring(start, index - start);
         }

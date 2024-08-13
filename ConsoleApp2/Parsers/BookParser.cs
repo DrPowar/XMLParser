@@ -1,6 +1,6 @@
 ﻿using ConsoleApp2.Constants;
 using ConsoleApp2.Entities;
-using ConsoleApp2.XMLUtils;
+using ConsoleApp2.XMLUtils.Models;
 
 namespace ConsoleApp2.Parsers
 {

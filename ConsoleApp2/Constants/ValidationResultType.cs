@@ -1,4 +1,4 @@
-﻿namespace ConsoleApp2.XMLUtils
+﻿namespace ConsoleApp2.Constants
 {
     public enum ValidationResultType
     {

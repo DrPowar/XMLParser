@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp2.XMLUtils
+namespace ConsoleApp2.XMLUtils.Models
 {
     public class XMLNodeTracker
     {

@@ -1,11 +1,8 @@
 ﻿using ConsoleApp2.Constants;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ConsoleApp2.XMLUtils.Models;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace ConsoleApp2.XMLUtils
+namespace ConsoleApp2.XML.Utils
 {
     internal static class XMLStringHelper
     {
@@ -90,13 +87,13 @@ namespace ConsoleApp2.XMLUtils
             }
         }
 
-        public static string RemoveInvalidNodes(string xml, List<Range> invalidNodes)
+        public static string RemoveInvalidNodes(string xml, List<NodeRange> invalidNodes)
         {
             StringBuilder sb = new(xml);
 
             invalidNodes.Sort((a, b) => b.End.CompareTo(a.End));
 
-            foreach (Range range in invalidNodes)
+            foreach (NodeRange range in invalidNodes)
             {
                 sb.Remove((int)range.Start, (int)(range.End - range.Start + 1));
             }

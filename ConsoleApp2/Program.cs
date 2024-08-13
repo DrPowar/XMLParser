@@ -2,13 +2,14 @@
 using ConsoleApp2.Constants;
 using ConsoleApp2.Entities;
 using ConsoleApp2.Exceptions;
+using ConsoleApp2.XML.Utils;
 using ConsoleApp2.XMLUtils;
 using System.Reflection;
 using System.Text;
 
-BenchmarkSwitcher
-    .FromAssembly(Assembly.GetExecutingAssembly())
-    .Run(args);
+//BenchmarkSwitcher
+//    .FromAssembly(Assembly.GetExecutingAssembly())
+//    .Run(args);
 
 namespace ConsoleApp2
 {

@@ -11,21 +11,21 @@ namespace ConsoleApp2.Entities
             Console.WriteLine("  Books:");
             foreach (Book book in Books)
             {
-                Console.WriteLine("    " + book.ToString());
+                Console.WriteLine("    " + book);
                 Console.WriteLine("      Chapters:");
                 foreach (Chapter chapter in book.Chapters)
                 {
-                    Console.WriteLine("        " + chapter.ToString());
+                    Console.WriteLine("        " + chapter);
                 }
             }
             Console.WriteLine("  Members:");
             foreach (Member member in Members)
             {
-                Console.WriteLine("    " + member.ToString());
+                Console.WriteLine("    " + member);
                 Console.WriteLine("      Books:");
                 foreach (BorrowedBook book in member.BorrowedBooks)
                 {
-                    Console.WriteLine("        " + book.ToString());
+                    Console.WriteLine("        " + book);
                 }
             }
         }

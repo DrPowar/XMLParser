@@ -4,20 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp2
+namespace ConsoleApp2.XMLUtils
 {
     public class XMLNodeTracker
     {
-        public Stack<uint> NodeStack { get; private set; }
+        public Stack<uint> NodeStack { get; private set; } = new Stack<uint>();
         public uint Start { get; private set; }
         public uint End { get; private set; }
-        public bool IsValid { get; set; }
-
-        public XMLNodeTracker()
-        {
-            NodeStack = new Stack<uint>();
-            IsValid = true;
-        }
+        public bool IsValid { get; set; } = true;
 
         public void PushStart(uint index)
         {

@@ -14,8 +14,6 @@ namespace ConsoleApp2.XMLUtils
         public ValidationResult IsValid(string xml)
         {
             int index = 0;
-
-
             while (index < xml.Length)
             {
                 ValidationResult result = IsValidElement(xml, ref index);
@@ -220,7 +218,6 @@ namespace ConsoleApp2.XMLUtils
             {
                 index++;
             }
-            var a = GetFullLine(xml, index);
             return true;
         }
 

@@ -21,9 +21,13 @@ namespace ConsoleApp2.Parsers
             foreach (KeyValuePair<string, string> attribute in attributes)
             {
                 if (attribute.Key == BookConst.Id)
+                {
                     id = uint.Parse(attribute.Value);
+                }
                 else if (attribute.Key == BookConst.Genre)
+                {
                     genre = attribute.Value;
+                }
             }
 
             return (id, genre);

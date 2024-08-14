@@ -64,7 +64,15 @@ namespace ConsoleApp2.XML.Utils
 
         public static void SkipWhiteSpaces(string xml, ref int index)
         {
-            while (xml[index] == (char)XMLSymbols.Whitespace)
+            while (IsSymbol(xml, index, XMLSymbols.Whitespace))
+            {
+                index++;
+            }
+        }
+
+        public static void SkipWhitespaceAndControlCharacters(string xml, ref int index)
+        {
+            while (IsSymbol(xml, index, XMLSymbols.Whitespace) || IsSymbol(xml, index, XMLSymbols.NextLineSymbol) || IsSymbol(xml, index, XMLSymbols.CarriageReturn))
             {
                 index++;
             }

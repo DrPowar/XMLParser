@@ -34,7 +34,7 @@ namespace ConsoleApp2.XMLUtils
             int startIndex = index;
             List<string> errors = new List<string>();
 
-            SkipWhiteSpaces(xml, ref index);
+            SkipWhitespaceAndControlCharacters(xml, ref index);
 
             string openingTag;
             if (!ValidateOpeningTag(xml, ref index, out openingTag, nodeTracker, errors))

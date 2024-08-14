@@ -51,14 +51,20 @@ namespace ConsoleApp2.XML.Utils
 
             foreach (XmlNode node in nodes)
             {
+                List<Book> books = new List<Book>();
+                List<Member> members = new List<Member>();
                 foreach (XmlNode child in node.Children)
                 {
-                    List<Book> books = ParseNodes(child, LibraryConst.Books, BookParser.ParseBook);
-
-                    List<Member> members = ParseNodes(child, LibraryConst.Members, MemberParser.ParseMember);
-
-                    libs.Add(new Library(books, members));
+                    if(child.Name == LibraryConst.Books)
+                    {
+                        books = ParseNodes(child, LibraryConst.Books, BookParser.ParseBook);
+                    }
+                    else if(child.Name == LibraryConst.Members)
+                    {
+                        members = ParseNodes(child, LibraryConst.Members, MemberParser.ParseMember);
+                    }
                 }
+                libs.Add(new Library(books, members));
             }
 
             return libs;
@@ -83,7 +89,7 @@ namespace ConsoleApp2.XML.Utils
 
         private XmlNode ParseElement(string xml, ref int index)
         {
-            SkipWhiteSpaces(xml, ref index);
+            SkipWhitespaceAndControlCharacters(xml, ref index);
 
             SkipSymbol(xml, ref index, XMLSymbols.XmlTagOnpeningBracket);
             string tagName = ParseTagName(xml, ref index);

@@ -39,7 +39,7 @@ namespace ConsoleApp2.XMLUtils
             string openingTag;
             if (!ValidateOpeningTag(xml, ref index, out openingTag, nodeTracker, errors))
             {
-                return new ValidationResult(ValidationResultType.CriticalFailure, ValidationMessageConst.OpeningTagMissing + GetFullLine(xml, index));
+                return new ValidationResult(ValidationResultType.CriticalFailure, ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
             }
 
             if (IsTagClosed(xml[index]))
@@ -81,13 +81,12 @@ namespace ConsoleApp2.XMLUtils
 
             if (!TryParseTagName(xml, ref index, out tagName))
             {
-                errors.Add(ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
-                nodeTracker.IsValid = false;
+                return false;
             }
 
             if (!IsValidAttributes(xml, ref index))
             {
-                errors.Add(ValidationMessageConst.InvalidTag + GetFullLine(xml, index));
+                errors.Add(ValidationMessageConst.InvalidAttribute + GetFullLine(xml, index));
                 nodeTracker.IsValid = false;
             }
 
@@ -221,6 +220,7 @@ namespace ConsoleApp2.XMLUtils
             {
                 index++;
             }
+            var a = GetFullLine(xml, index);
             return true;
         }
 

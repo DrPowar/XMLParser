@@ -7,6 +7,6 @@
         internal const string Success = "Success.";
         internal const string InvalidInnerContext = "Invalid inner context.";
         internal const string MismatchTagNames = "The opening tag and the closing tag have different names.";
-        internal const string InvalidTag = "Tag name is not valid.";
+        internal const string InvalidTag = "Tag is not valid.";
     }
 }

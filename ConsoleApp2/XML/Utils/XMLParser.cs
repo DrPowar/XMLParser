@@ -94,19 +94,19 @@ namespace ConsoleApp2.XML.Utils
 
             if (IsTagClosed(xml[index]))
             {
-                SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.XmlTagCloseBracket, XMLSymbols.XmlSelfClosingSlash });
+                SkipSymbols(xml, ref index, [XMLSymbols.XmlTagCloseBracket, XMLSymbols.XmlSelfClosingSlash]);
                 return node;
             }
 
             SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
             HandleInnerContext(xml, ref index, node);
 
-            SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.XmlTagOnpeningBracket, XMLSymbols.XmlSelfClosingSlash });
+            SkipSymbols(xml, ref index, [XMLSymbols.XmlTagOnpeningBracket, XMLSymbols.XmlSelfClosingSlash] );
             SkipWhiteSpaces(xml, ref index);
             string closingTagName = ParseTagName(xml, ref index);
 
             SkipSymbol(xml, ref index, XMLSymbols.XmlTagCloseBracket);
-            SkipSymbols(xml, ref index, new List<XMLSymbols> { XMLSymbols.NextLineSymbol, XMLSymbols.CarriageReturn });
+            SkipSymbols(xml, ref index, [XMLSymbols.NextLineSymbol, XMLSymbols.CarriageReturn]);
 
             return node;
         }
@@ -139,7 +139,7 @@ namespace ConsoleApp2.XML.Utils
             }
 
             string value = xml.Substring(start, index - start);
-            index++;
+            SkipSymbol(xml, ref index, XMLSymbols.AttributeValueDelimiterSign);
 
             return (name, value);
         }
@@ -160,7 +160,7 @@ namespace ConsoleApp2.XML.Utils
         {
             while (!IsSymbol(xml, index, XMLSymbols.XmlTagOnpeningBracket) || !IsSymbol(xml, index + 1, XMLSymbols.XmlSelfClosingSlash))
             {
-                if (xml[index] == (char)XMLSymbols.XmlTagOnpeningBracket)
+                if (IsSymbol(xml, index, XMLSymbols.XmlTagOnpeningBracket))
                 {
                     HandleChildElement(xml, ref index, node);
                 }
